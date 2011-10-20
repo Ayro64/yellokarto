@@ -454,49 +454,49 @@ let initGL _ =
    
 
 let display3D _ =
-GlClear.clear [`depth ; `color];
-	GlMat.rotate ~angle:(-100. *. time ()) ~x:1. ~y:1. ~z:0. ();
+  GlClear.clear [`depth ; `color];
+  GlMat.rotate ~angle:(-100. *. time ()) ~x:1. ~y:1. ~z:0. ();
+  
+  GlDraw.begins `quads;
+  
+  GlDraw.color (1., 0., 0.);
+  GlDraw.vertex3 (1., 1., 1.);
+  GlDraw.vertex3 (1., 1., -1.);
+  GlDraw.vertex3 (-1., 1., -1.);
+  GlDraw.vertex3 (-1., 1., 1.);
+  
+  GlDraw.color (0., 1., 0.);
+  GlDraw.vertex3 (1., -1., 1.);
+  GlDraw.vertex3 (1., -1., -1.);
+  GlDraw.vertex3 (1., 1., -1.);
+  GlDraw.vertex3 (1., 1., 1.);
+  
+  GlDraw.color (0., 0., 1.);
+  GlDraw.vertex3 (-1., -1., 1.);
+  GlDraw.vertex3 (-1., -1., -1.);
+  GlDraw.vertex3 (1., -1., -1.);
+  GlDraw.vertex3 (1., -1., 1.);
+  
+  GlDraw.color (0.8, 0.1, 0.89);
+  GlDraw.vertex3 (-1., 1., -1.);
+  GlDraw.vertex3 (1., 1., -1.);
+  GlDraw.vertex3 (1., -1., -1.);
+  GlDraw.vertex3 (-1., -1., -1.);
+  
+  GlDraw.color (0.7, 0.5, 0.12);
+  GlDraw.vertex3 (-1., 1., 1.);
+  GlDraw.vertex3 (-1., 1., -1.);
+  GlDraw.vertex3 (-1., -1., -1.);
+  GlDraw.vertex3 (-1., -1., 1.);
 	
-	GlDraw.begins `quads;
-	
-	GlDraw.color (1., 0., 0.);
-	GlDraw.vertex3 (1., 1., 1.);
-	GlDraw.vertex3 (1., 1., -1.);
-	GlDraw.vertex3 (-1., 1., -1.);
-	GlDraw.vertex3 (-1., 1., 1.);
-	
-	GlDraw.color (0., 1., 0.);
-	GlDraw.vertex3 (1., -1., 1.);
-	GlDraw.vertex3 (1., -1., -1.);
-	GlDraw.vertex3 (1., 1., -1.);
-	GlDraw.vertex3 (1., 1., 1.);
-	
-	GlDraw.color (0., 0., 1.);
-	GlDraw.vertex3 (-1., -1., 1.);
-	GlDraw.vertex3 (-1., -1., -1.);
-	GlDraw.vertex3 (1., -1., -1.);
-	GlDraw.vertex3 (1., -1., 1.);
-	
-	GlDraw.color (0.8, 0.1, 0.89);
-	GlDraw.vertex3 (-1., 1., -1.);
-	GlDraw.vertex3 (1., 1., -1.);
-	GlDraw.vertex3 (1., -1., -1.);
-	GlDraw.vertex3 (-1., -1., -1.);
-	
-	GlDraw.color (0.7, 0.5, 0.12);
-	GlDraw.vertex3 (-1., 1., 1.);
-	GlDraw.vertex3 (-1., 1., -1.);
-	GlDraw.vertex3 (-1., -1., -1.);
-	GlDraw.vertex3 (-1., -1., 1.);
-	
-	GlDraw.color (0.05, 0.60, 1.);
-	GlDraw.vertex3 (-1., 1., 1.);
-	GlDraw.vertex3 (1., 1., 1.);
-	GlDraw.vertex3 (1., -1., 1.);
-	GlDraw.vertex3 (-1., -1., 1.);	
-	GlDraw.ends ();	
-	Gl.flush ()
-
+  GlDraw.color (0.05, 0.60, 1.);
+  GlDraw.vertex3 (-1., 1., 1.);
+  GlDraw.vertex3 (1., 1., 1.);
+  GlDraw.vertex3 (1., -1., 1.);
+  GlDraw.vertex3 (-1., -1., 1.);	
+  GlDraw.ends ();	
+  Gl.flush ()
+    
 let area = 
   let b =
     GlGtk.area [`RGBA;`DEPTH_SIZE 1;`DOUBLEBUFFER]
@@ -504,10 +504,9 @@ let area =
     ignore(b#connect#realize ~callback:initGL);	
     ignore(b#connect#display (fun () -> display3D (); b#swap_buffers ()));
     b
-     
+      
    
-   let _ =
- ignore( mainWindow#connect#destroy GMain.quit);
+let _ =
+  ignore( mainWindow#connect#destroy GMain.quit);
   mainWindow#show ();
   GMain.main ()
-
