@@ -1,0 +1,14 @@
+Bienvenue dans le logiciel "Yello Karto"! Nous avons mis à votre disposition ce guide d'utilisation vous permettant de comprendre clairement les différentes options que le programme propose.
+ 
+Yello Karto est un logiciel de modélisation 3D, c'est-à-dire qu'à partir d'un fichier image selectionné, il permet de reproduire une vue en relief de votre carte, en fonction des options souhaitées (altitudes, pas, etc.).
+
+	1) Pour commencer, selectionnez une carte enregistrée parmis l'un des formats suivant : JPG, JPEG, PNG, BMP.
+
+	2) Votre carte est alors affichée dans la sélection traitement qui vous permet de spécifier les traitements que vous voulez lui apporter.
+	
+	3) L'étape suivante consiste à définir vos options de modélisation, comme la hauteur du relief en fonction des différentes couleurs et autres.
+
+	4) Une fois vos préférences apportées aux options de modélisation, votre carte sera transmise au moteur 3D de Yello Karto pour être modélisée. Vous pourrez alors voir le résultat dans l'onget modélisation 3D et survoler votre carte, parcourir les montagnes, et pourquoi pasfaire trempette ?
+
+Momo a une petite bite !
+
