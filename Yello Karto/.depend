@@ -1,0 +1,4 @@
+traitement_image.cmo:
+traitement_image.cmx:
+yellokarto.cmo: traitement_image.cmo
+yellokarto.cmx: traitement_image.cmx
