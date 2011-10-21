@@ -76,8 +76,7 @@ GPack.vbox
 
 (*** Ajout des onglets ***)
 (* NOTEBOOK *)
-let notebook =
-    GPack.notebook
+let notebook = GPack.notebook
       ~homogeneous_tabs:true
       ~show_border:true
       ~show_tabs:true
@@ -118,6 +117,16 @@ let onglet3 =
 
 let addonglet3 = notebook#insert_page
   ~tab_label:text_onglet3#coerce onglet3#coerce
+
+let window3D = GBin.frame
+  ~label:"Rendu 3D"
+  ~packing:onglet3#add ()
+
+let layout_3D = GPack.fixed
+  ~border_width:1
+  ~packing:window3D#add ()
+
+
 
 (*** Création des boites pour afficher les images  ***)
 
@@ -398,12 +407,6 @@ let check_button_grille =
       ~packing:hboxcheck#add () in
             button#connect#clicked ~callback:(fun () -> get_filter_grill (); set_filter (); display_colors ())
 
-let display3Dbutton =
-  let button = GButton.button
-    ~label:"Affichage 3D"
-    ~packing:onglet3#pack () in
-  button
-
 (*** Button Open, About & Quit, Afficher un texte à l'écran ***)
 
 
@@ -449,30 +452,45 @@ let textAccueil =
                         ~line_wrap:true
                         ~packing:onglet1#add ()
 
-let area = 
-  let b =
-    GlGtk.area [`RGBA;`DEPTH_SIZE 1;`DOUBLEBUFFER]
-    ~width:800 ~height:600 ~packing:onglet3#add () in  
-  ignore(b#connect#realize ~callback:Moteur3D.initGL);
-   let rec refresh _ =    
-       ignore(b#connect#display (fun () -> b#make_current (); Moteur3D.display3D (); 
-       b#swap_buffers (); print_endline "1"; refresh () ))
-   in refresh ()
+let area = GlGtk.area
+  [ `RGBA; `DOUBLEBUFFER; `BUFFER_SIZE 8 ;`DEPTH_SIZE 16]
+  ~width:800
+  ~height:470
+  ~show:true
+  ~packing:layout_3D#add ()
 
+let initGLenable = ref false
+let stopinitGL = ref false
 
-(*
-let area = 
-  let b =
-    GlGtk.area [`RGBA;`DEPTH_SIZE 1;`DOUBLEBUFFER]
-    ~width:800 ~height:600 ~packing:onglet3#add () in
-    ignore(b#connect#realize ~callback:Moteur3D.initGL); 
-       ignore(b#connect#display (fun () -> b#make_current (); Moteur3D.display3D (); 
-       b#swap_buffers ()));
-       b
-*)    
-   
+let rec initthisgl () =
+if(notebook#current_page = 2) then
+  (if not(!initGLenable) then
+  (notebook#goto_page 2;
+    area#make_current ();
+    Moteur3D.initGL ();
+    initGLenable := true;
+    stopinitGL := true);
+   ignore(GMain.Timeout.add ~ms:50 ~callback:(fun () -> initthisgl();false)))
+  
+  
+let refresh_area () = 
+ if (notebook#current_page = 2) then 
+        begin
+          area#make_current ();
+          Moteur3D.display3D();
+          area#swap_buffers()
+        end
+    
+
+let init_area ()=
+  ignore(GMain.Timeout.add ~ms:5 ~callback:(fun () -> initthisgl();not(!stopinitGL)));
+    ignore(GMain.Timeout.add ~ms:30 ~callback:(fun () -> refresh_area();true));
+    ignore(area#connect#display ~callback:(fun () ->refresh_area()))
+
+    
    let _ =
  ignore( mainWindow#connect#destroy GMain.quit);
-  mainWindow#show ();
-  GMain.main ()
+ init_area ();
+ mainWindow#show ();
+ GMain.main ()
 
