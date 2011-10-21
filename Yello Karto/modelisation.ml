@@ -115,7 +115,8 @@ let dualtotriple img pointlist =
 	in d2t pointlist
 
 (*creation du fichier obj*)
-let create_obj_file img =
+let create_obj_file filepath =
+    let img = loadImage filepath in
   let l = textfile_to_pointlist in
     let threepointlist = dualtotriple img l in
 	makeobj threepointlist ()
