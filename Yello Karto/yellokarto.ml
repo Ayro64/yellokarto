@@ -22,7 +22,7 @@ let _ = GMain.init () (* initialisation du main *)
 let mainWindow = GWindow.window
   ~width:1024
   ~height:700
-  ~resizable:true
+  ~resizable:false
   ~title:"Yello Karto" ()
 
 (*** Menu du haut ***)
@@ -342,6 +342,16 @@ let get_filter_grill () = match !filter_state with
     |_ -> ()
 
 
+let validateColor color altitude button () =
+            button#set_label (altitude#text ^ " sauvegardé...")
+                  (*  let (r,g,b) = color in
+                                    imageToParse#set_listColorsRGB (((r+g+b)/3,
+int_of_string altitude#text)::(imageToParse#get_listColorsRGB))
+                                            (*print_endline (string_of_int
+                                             * (List.length
+                                             * imageToParse#get_listColorsRGB))*)*)
+
+
     (* affiche la liste des couleurs trouvé *)
 let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
         match l with
@@ -363,6 +373,8 @@ let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
                 in
                 begin
                   entry#misc#modify_base [`NORMAL, `NAME color];
+                  ignore(button#connect#clicked ~callback:(validateColor (r,g,b)
+                  entry button));
                   button#set_border_width 20;
                 end;
                 displayColors l
@@ -384,7 +396,7 @@ let check_button_grille =
        ~label:"Affichage de la grille"
        ~active:false
       ~packing:hboxcheck#add () in
-            button#connect#clicked (fun () -> get_filter_grill (); set_filter (); display_colors ())
+            button#connect#clicked ~callback:(fun () -> get_filter_grill (); set_filter (); display_colors ())
 
 let display3Dbutton =
   let button = GButton.button
@@ -437,21 +449,28 @@ let textAccueil =
                         ~line_wrap:true
                         ~packing:onglet1#add ()
 
-
-
-
 let area = 
   let b =
     GlGtk.area [`RGBA;`DEPTH_SIZE 1;`DOUBLEBUFFER]
-      ~width:800 ~height:600 ~packing:onglet3#add () in
-    ignore(b#connect#realize ~callback:Moteur3D.initGL);
-    ignore(GMain.Timeout.add ~ms:30 ~callback:
-	     (fun () -> b#make_current ();
-		b#swap_buffers();true));	
-    ignore(b#connect#display (fun () -> Moteur3D.display3D ()));
-    b
-      
-      
+    ~width:800 ~height:600 ~packing:onglet3#add () in  
+  ignore(b#connect#realize ~callback:Moteur3D.initGL);
+   let rec refresh _ =    
+       ignore(b#connect#display (fun () -> b#make_current (); Moteur3D.display3D (); 
+       b#swap_buffers (); print_endline "1"; refresh () ))
+   in refresh ()
+
+
+(*
+let area = 
+  let b =
+    GlGtk.area [`RGBA;`DEPTH_SIZE 1;`DOUBLEBUFFER]
+    ~width:800 ~height:600 ~packing:onglet3#add () in
+    ignore(b#connect#realize ~callback:Moteur3D.initGL); 
+       ignore(b#connect#display (fun () -> b#make_current (); Moteur3D.display3D (); 
+       b#swap_buffers ()));
+       b
+*)    
+   
    let _ =
  ignore( mainWindow#connect#destroy GMain.quit);
   mainWindow#show ();

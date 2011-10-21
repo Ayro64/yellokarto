@@ -27,6 +27,9 @@ let level (r,g,b) = float_of_int(r) *. 0.3 +.  float_of_int(g) *. 0.59  +.
 
 (* séparation des couleurs avec ligne noire *)   
 
+let everCreate = ref false
+
+
 let image2bb img =
      let (w,h) = get_dims img in
          for i = 0 to h-2 do
@@ -62,7 +65,7 @@ let add_if_new elt list = match (elt, list) with
 let image2grill img n =
   let listepoints = ref [] in
      let (w,h) = get_dims img in
-       image2bb img;
+     if(not (!everCreate)) then (image2bb img;
        for i=0 to (h-1) do
          for j=0 to (w-1) do
 
@@ -91,12 +94,19 @@ let image2grill img n =
 		end;
          done;
        done;
-print_list !listepoints ()
+       print_list !listepoints (); everCreate := true)
+        else (for i=0 to (h-1) do
+      for j=0 to (w-1) do
+          if((i mod n = 0) || (j mod n = 0) 
+          || (n-(j mod n) = i mod n) || (i mod n = j mod n)) then
+      Sdlvideo.put_pixel_color img j i (0,0,0);
+      done
+    done)
 
 let createGrill filepath () n=
      begin 
          let img = loadImage filepath in
-         image2grill img n;        
+         image2grill img n;
          saveImage img (filepath^".grille.bmp");
      end 
           
