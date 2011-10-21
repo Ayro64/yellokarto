@@ -16,7 +16,8 @@ let initGL _ =
 
 let display3D _ =
 GlClear.clear [`depth ; `color];
-	GlMat.rotate ~angle:(-100. *. time ()) ~x:1. ~y:1. ~z:0. ();
+GlMat.load_identity ();
+GlMat.rotate ~angle:(-100. *. time ()) ~x:1. ~y:1. ~z:0. ();
 	
 	GlDraw.begins `quads;
 	
