@@ -7,7 +7,7 @@ cube: libgtkgl-2.0.so moteur3D.ml modelisation.ml traitement_image.ml yellokarto
 	rm -f *~ *.o *.cm?
 
 libgtkgl-2.0.so:
-	-ln -s /usr/lib/libgtkgl-2.0.so.1 libgtkgl-2.0.so
+	-ln -s /usr/lib64/libgtkgl-2.0.so.1 libgtkgl-2.0.so
 
 clean:
 	rm -f *~ *.o *.cm? 

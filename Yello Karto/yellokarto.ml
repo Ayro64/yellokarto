@@ -9,12 +9,10 @@ let display_state = false
 let file_path = ref "images/Kassocié.png" (* variable ou on stock le chemin de l'image*)
 let acc = ref 0
 let img_not_empty = ref false
-let filter_state = ref 0 (*
-                          * Si state = 0, grille & separate colors = 0,
-                          * Si state = 1, grille = 1 & separate colors = 0
-                          * Si state = 2, grille = 0 & separate colors = 1
-                          * Si state = 3, grille & separate colors = 1 
-                          *)
+let filter_state = ref false (*
+                          * Si state = 0, grille = false
+                          * Si state = 1, grille = true  
+                              *)
 let _ = GMain.init () (* initialisation du main *)
 
 
@@ -141,8 +139,8 @@ let image =
 (* fonction appelé lorsque l'on clique sur le bouton parcourir *)
 
 let load_img text =
-    file_path := text; (* met le lien du fichier dans file_path *)
-  image#set_file !file_path;
+  (* met le lien du fichier dans file_path *)
+  image#set_file text;
   img_not_empty := true;
   flush stdout
 
@@ -168,7 +166,10 @@ let openBox _ =
   dlg#set_filter img_filter;
   dlg#add_button_stock `CANCEL `CANCEL;
   dlg#add_select_button_stock `OPEN `OPEN;
-  if dlg#run() = `OPEN then (load_img(str_op(dlg#filename)));
+  if dlg#run() = `OPEN then ((file_path := (str_op(dlg#filename)));
+                Traitement_image.blackborder !file_path;
+                file_path := (!file_path^".bb.bmp");
+                (load_img !file_path));
   dlg#misc#hide ()
 
 (* About button with credits, license, website *)
@@ -320,35 +321,10 @@ let vboxOption2 =
 
  (* Récupère l'état de filter_state pour savoir quelle fonction appliqué *)
 let set_filter () = match !filter_state with
-    | 0 -> image#set_file !file_path
-    | 1 -> Traitement_image.createGrill !file_path () 25;
+      true -> image#set_file !file_path; filter_state := false
+    | false -> Traitement_image.createGrill !file_path 25; filter_state := true;
            image#set_file (!file_path^".grille.bmp");
            (Sys.remove (!file_path^".grille.bmp"))
-    | 2 -> Traitement_image.blackborder !file_path ();
-           image#set_file (!file_path^".bb.bmp");
-           (Sys.remove (!file_path^".bb.bmp"))
-    | 3 -> Traitement_image.separateGrill !file_path () 25;
-           image#set_file (!file_path^".bbgrille.bmp");
-           (Sys.remove (!file_path^".bbgrille.bmp"))
-    | _ -> ()
-
-
-    (* Récupère l'état courant du filtre appliqué à l'image pour savoir quelle
-     * fixer le nouvelle état et par la suite rappeler set_filter  *)
-
-let get_filter_separate () = match !filter_state with 
-     0 -> filter_state := 2
-    |1 -> filter_state := 3
-    |2 -> filter_state := 0
-    |3 -> filter_state := 1
-    |_ -> ()
-
-let get_filter_grill () = match !filter_state with 
-     0 -> filter_state := 1
-    |1 -> filter_state := 0
-    |2 -> filter_state := 3
-    |3 -> filter_state := 2
-    |_ -> ()
 
 
 let validateColor color altitude button () =
@@ -393,19 +369,12 @@ let display_colors _ = if(!img_not_empty && not display_state) then
         ((displayColors (Modelisation.get_list_colours !file_path));
         img_not_empty := false)
 
-let check_button_separate_colors =
-         let button = GButton.check_button
-       ~label:"Séparation des couleurs"
-       ~active:false
-       ~packing:hboxcheck#add () in
-         button#connect#clicked (fun () -> get_filter_separate (); set_filter (); display_colors ())
-
 let check_button_grille =
             let button = GButton.check_button
        ~label:"Affichage de la grille"
        ~active:false
       ~packing:hboxcheck#add () in
-            button#connect#clicked ~callback:(fun () -> get_filter_grill (); set_filter (); display_colors ())
+            button#connect#clicked ~callback:(fun () ->  set_filter (); display_colors ())
 
 (*** Button Open, About & Quit, Afficher un texte à l'écran ***)
 
@@ -434,7 +403,8 @@ let quit =
       let button = GButton.button
           ~stock:`QUIT
           ~packing:vboxInfo#add () in
-       ignore( button#connect#clicked GMain.quit);
+      ignore( button#connect#clicked (fun () ->  (GMain.quit ();(Sys.remove
+      !file_path))));
    button
 
 
@@ -489,7 +459,7 @@ let init_area ()=
 
     
    let _ =
- ignore( mainWindow#connect#destroy GMain.quit);
+ ignore(mainWindow#connect#destroy ~callback:GMain.quit);
  init_area ();
  mainWindow#show ();
  GMain.main ()

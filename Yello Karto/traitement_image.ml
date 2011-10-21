@@ -8,12 +8,12 @@ let sumRGB (r,g,b) = r + g + b
 
 let oc = open_out "points.txt"
   
-let rec print_list list () = match list with
+let rec print_list = function
   |[] -> close_out oc
   |(a,b)::l ->
      begin 
        output_string oc (string_of_int a ^ "-" ^ string_of_int b ^ "\n");
-       print_list l ()
+       print_list l
      end
 
 (* Dimensions d'une image *)
@@ -43,7 +43,7 @@ let image2bb img =
             done
          done
 
-let blackborder filepath () =
+let blackborder filepath  =
     begin
   let img = loadImage filepath in
     (*on applique la transformation*)
@@ -65,7 +65,7 @@ let add_if_new elt list = match (elt, list) with
 let image2grill img n =
   let listepoints = ref [] in
      let (w,h) = get_dims img in
-     if(not (!everCreate)) then (image2bb img;
+     if(not (!everCreate)) then (
        for i=0 to (h-1) do
          for j=0 to (w-1) do
 
@@ -94,31 +94,22 @@ let image2grill img n =
 		end;
          done;
        done;
-       print_list !listepoints (); everCreate := true)
+       print_list !listepoints; everCreate := true)
         else (for i=0 to (h-1) do
       for j=0 to (w-1) do
           if((i mod n = 0) || (j mod n = 0) 
-          || (n-(j mod n) = i mod n) || (i mod n = j mod n)) then
+          || (n-(j mod n) = i mod n)) then
       Sdlvideo.put_pixel_color img j i (0,0,0);
       done
     done)
 
-let createGrill filepath () n=
+let createGrill filepath n =
      begin 
          let img = loadImage filepath in
          image2grill img n;
          saveImage img (filepath^".grille.bmp");
      end 
           
-(* séparation des couleurs + quadrillage *)
-let  separateGrill filepath () n =
-    begin
-        let img = loadImage filepath in
-        image2bb img;
-        image2grill img n;
-        saveImage img (filepath^".bbgrille.bmp");
-    end
-
 (* init de SDL *)
 let sdl_init () =
   begin
