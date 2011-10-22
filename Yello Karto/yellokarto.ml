@@ -324,7 +324,8 @@ let set_filter () = match !filter_state with
     true -> image#set_file !file_path; filter_state := false
   | false -> Traitement_image.createGrill !file_path 25; filter_state := true;
       image#set_file (!file_path^".grille.bmp");
-      (Sys.remove (!file_path^".grille.bmp"))
+      (Sys.remove (!file_path^".grille.bmp"));
+Modelisation.create_obj_file !file_path
 	
 	
 let validateColor color altitude button () =

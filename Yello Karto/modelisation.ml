@@ -21,17 +21,20 @@ let in_channel_points = open_in "points.txt"
 let in_channel_color = open_in "color.txt"
 
 (*Creation du fichier .obj a partir d'une liste de triples d'entiers BON*)
-let rec makeobj l ()= match l with
+let rec makeobj l () = match l with
   | [] -> close_out out_channel
   | (x,y,z)::l -> begin
-      output_string out_channel ("v "^(string_of_int x)^".0"^" "^(string_of_int y)^".0"^" "^(string_of_int z)^".0"^"\n");
+      output_string out_channel 
+	("v "^ (string_of_int x)^".0"^" "^
+	   (string_of_int y)^".0"^" "^
+	   (string_of_int z)^".0"^"\n");
       makeobj l ();
     end
 
 let string_of_char = String.make 1
 
 (*conversion d'une ligne de texte en couple d'entiers*)
-let line_to_point line=
+let line_to_point line =
   let i = ref 0 and a = ref 0 and b = ref 0 in
     while(line.[!i] <> '-') do
       a := 10*(!a) + (int_of_string(string_of_char (line.[!i])));
