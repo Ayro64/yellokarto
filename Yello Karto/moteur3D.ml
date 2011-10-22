@@ -1,7 +1,3 @@
-(* #directory "+lablGL" *)
-(* #load "unix.cma" *)
-(* #load "lablgl.cma" *)
-
 let in_channel_map = open_in "map3d.obj"
   
 let string_of_char = String.make 1
@@ -57,7 +53,7 @@ let initGL _ =
   GlMat.mode `projection;
   GlMat.load_identity ();
   GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 1000.);
-  GluMat.look_at (500., 500., 100.) (250., 250., 0.) ( 0., 0., 1.);
+  GluMat.look_at (250., 250., 100.) (250., 250., 0.) ( 0., 0., 1.);
   GlMat.mode `modelview;
   GlMat.load_identity ();
   GlClear.clear [`depth ; `color];
@@ -66,7 +62,7 @@ let initGL _ =
 let display3D _ =
   GlClear.clear [`depth ; `color];
   GlMat.load_identity ();
-  (* GlMat.rotate ~angle:(-100. *. time ()) ~x:1. ~y:1. ~z:0. (); *)
+  GlMat.rotate ~angle:(-100. *. time ()) ~x:0. ~y:0. ~z:1. ();
 
   GlDraw.begins `points;
 
