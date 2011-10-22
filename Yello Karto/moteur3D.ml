@@ -62,7 +62,7 @@ let initGL _ =
 let display3D _ =
   GlClear.clear [`depth ; `color];
   GlMat.load_identity ();
-  GlMat.rotate ~angle:(-100. *. time ()) ~x:0. ~y:0. ~z:1. ();
+  GlMat.rotate ~angle:(-100. *. time ()) ~x:0. ~y:0. ~z:0. ();
 
   GlDraw.begins `points;
 
