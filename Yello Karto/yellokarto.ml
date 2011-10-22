@@ -205,8 +205,8 @@ let fileEntries ()=
 let editEntries ()=
   [
     `I ("Traitement de l'image", fun _-> ());
-    `I ("Generer le terrain", 
-	(Modelisation.create_obj_file !file_path));
+    `I ("Generer le terrain", (fun _ -> 
+	(Modelisation.create_obj_file !file_path)));
   ]
 
 let toolEntries ()=
