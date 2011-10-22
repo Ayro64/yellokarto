@@ -1,8 +1,12 @@
-(*let in_channel_map = open_in "fichier.obj"
+(* #directory "+lablGL" *)
+(* #load "unix.cma" *)
+(* #load "lablgl.cma" *)
+
+let in_channel_map = open_in "map3d.obj"
   
 let string_of_char = String.make 1
   
-let line2p line=
+let line2p line =
   let i = ref 2 and x = ref 0. and y = ref 0. and z = ref 0. and s = ref "" in
     while(line.[!i] <> ' ') do
       s := !s^(string_of_char (line.[!i]));
@@ -15,13 +19,13 @@ let line2p line=
       s := !s^(string_of_char (line.[!i]));
       i := !i+1;
     done;
-    z := float_of_string !s;
+    y := float_of_string !s;
     s := "";
     i := !i+1;
     while(!i < String.length line) do
       s := !s^(string_of_char (line.[!i]));
       i := !i+1;
-    done;
+done;
     z := float_of_string !s;
     (!x, !y, !z)
       
@@ -39,7 +43,7 @@ let getpoints =
       done; []
     with End_of_file -> close_in in_channel_map;
       (string2plist !lines)
-*)
+
 
 let time =
   let start = Unix.gettimeofday () in
@@ -53,23 +57,22 @@ let initGL _ =
   GlMat.mode `projection;
   GlMat.load_identity ();
   GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 1000.);
-  GluMat.look_at (3., 4., 2.) (0., 0., 0.) ( 0., 0., 1.);
+  GluMat.look_at (500., 500., 100.) (250., 250., 0.) ( 0., 0., 1.);
   GlMat.mode `modelview;
   GlMat.load_identity ();
   GlClear.clear [`depth ; `color];
   Gl.enable `depth_test
 
-
 let display3D _ =
   GlClear.clear [`depth ; `color];
   GlMat.load_identity ();
-  GlMat.rotate ~angle:(-100. *. time ()) ~x:1. ~y:1. ~z:0. ();
+  (* GlMat.rotate ~angle:(-100. *. time ()) ~x:1. ~y:1. ~z:0. (); *)
 
-  GlDraw.begins `quads;
+  GlDraw.begins `points;
 
-  (*  iter getpoints;*)
+  iter getpoints;
 
-  GlDraw.color (1., 0., 0.);
+  (*GlDraw.color (1., 0., 0.);
   GlDraw.vertex3 (1., 1., 1.);
   GlDraw.vertex3 (1., 1., -1.);
   GlDraw.vertex3 (-1., 1., -1.);
@@ -103,7 +106,7 @@ let display3D _ =
   GlDraw.vertex3 (-1., 1., 1.);
   GlDraw.vertex3 (1., 1., 1.);
   GlDraw.vertex3 (1., -1., 1.);
-  GlDraw.vertex3 (-1., -1., 1.);
+  GlDraw.vertex3 (-1., -1., 1.);*)
   GlDraw.ends ();
 
   Gl.flush ()
