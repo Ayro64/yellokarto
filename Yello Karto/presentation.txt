@@ -10,5 +10,3 @@ Yello Karto est un logiciel de modélisation 3D, c'est-à-dire qu'à partir d'un
 
 	4) Une fois vos préférences apportées aux options de modélisation, votre carte sera transmise au moteur 3D de Yello Karto pour être modélisée. Vous pourrez alors voir le résultat dans l'onget modélisation 3D et survoler votre carte, parcourir les montagnes, et pourquoi pasfaire trempette ?
 
-Momo a une petite bite !
-
