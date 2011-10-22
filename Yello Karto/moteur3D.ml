@@ -52,7 +52,7 @@ let rec iter = function
 let initGL _ =
   GlMat.mode `projection;
   GlMat.load_identity ();
-  GluMat.perspective ~fovy:45.0 ~aspect:(800.0/.600.) ~z:(0.1, 1000.);
+  GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 1000.);
   GluMat.look_at (3., 4., 2.) (0., 0., 0.) ( 0., 0., 1.);
   GlMat.mode `modelview;
   GlMat.load_identity ();
@@ -105,4 +105,5 @@ let display3D _ =
   GlDraw.vertex3 (1., -1., 1.);
   GlDraw.vertex3 (-1., -1., 1.);
   GlDraw.ends ();
+
   Gl.flush ()
