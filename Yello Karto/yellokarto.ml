@@ -205,9 +205,10 @@ let fileEntries ()=
 let editEntries ()=
   [
     `I ("Traitement de l'image", fun _-> ());
-    `I ("Generer le terrain", fun _-> ());
+    `I ("Generer le terrain", 
+	(Modelisation.create_obj_file !file_path));
   ]
-    
+
 let toolEntries ()=
   [
     `I ("Prendre une capture d'écran", fun _-> ());
@@ -324,7 +325,6 @@ let set_filter () = match !filter_state with
     true -> image#set_file !file_path; filter_state := false
   | false -> Traitement_image.createGrill !file_path 25; filter_state := true;
       image#set_file (!file_path^".grille.bmp");
-    Modelisation.create_obj_file !file_path;
       (Sys.remove (!file_path^".grille.bmp"))
 	
 	
