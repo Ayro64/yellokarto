@@ -40,6 +40,7 @@ let getpoints =
     with End_of_file -> close_in in_channel_map;
     (string2plist !lines)
 *)
+
 let time =
   let start = Unix.gettimeofday () in
   fun () -> Unix.gettimeofday () -. start
