@@ -108,6 +108,7 @@ let addonglet2 = notebook#insert_page
   ~tab_label:text_onglet2#coerce onglet2#coerce
 
 
+
 let onglet3 =
   GPack.vbox
     ~homogeneous:false
@@ -125,7 +126,38 @@ let layout_3D = GPack.fixed
   ~border_width:1
   ~packing:window3D#add ()
 
+let vboxOnglet2 =
+    GPack.vbox 
+  ~spacing:4
+  ~border_width:4
+  ~packing:onglet2#add ()
 
+
+let hboxcheck =
+  GPack.hbox
+  ~spacing:4
+  ~border_width:4
+  ~packing:vboxOnglet2#add ()
+
+let hboxOption =
+  GPack.hbox 
+  ~spacing:4
+  ~border_width:4
+  ~packing:vboxOnglet2#add ()
+
+let vboxOption1 =
+  GPack.vbox
+    ~spacing:4
+    ~border_width:4
+    ~homogeneous:false
+    ~packing:hboxOption#add ()
+
+let vboxOption2 =
+  GPack.vbox
+    ~spacing:4
+    ~border_width:4
+    ~homogeneous:false
+    ~packing:hboxOption#add ()
 
 (*** Création des boites pour afficher les images  ***)
 
@@ -144,6 +176,45 @@ let load_img text =
   image#set_file text;
   img_not_empty := true;
   flush stdout
+
+let validateColor color hauteur button _ =
+    button#set_label (hauteur#text ^ " verrouillé");
+                   let (r,g,b) = color in
+                              Traitement_image.create_hauteur_list ((r+g+b)/3,(int_of_string
+                                 hauteur#text))
+
+
+    (* affiche la liste des couleurs trouvé *)
+let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
+        match l with
+         x::l -> let (r,g,b) = x in
+             let box = GPack.hbox
+                ~packing:(if(!acc mod 2 = 0) then vboxOption1#add
+                                            else vboxOption2#add) ()
+         in ignore (box); (acc := !acc + 1);
+               let entry = GEdit.entry
+                        ~text:""
+                        ~width:60
+                        ~height:30
+                        ~packing:box#add ()
+                and  button = GButton.button
+                        ~label:"Valider"
+                        ~packing:box#add ()
+                in
+                     let color = Printf.sprintf "#%02x%02x%02x" r g b
+                in
+                begin
+                  entry#misc#modify_base [`NORMAL, `NAME color];
+                 ignore(button#connect#clicked (validateColor (r,g,b) entry
+                 button));
+                  button#set_border_width 20;
+                end;
+                displayColors l
+        | _ -> ()
+
+let display_colors _ = if(!img_not_empty && not display_state) then
+        ((displayColors (Modelisation.get_list_colours !file_path));
+        img_not_empty := false)
 
 (*** action lier a menu en haut ***)
 
@@ -171,6 +242,7 @@ let openBox _ =
                 Traitement_image.blackborder !file_path;
                 file_path := (!file_path^".bb.bmp");
                 load_img !file_path;
+                display_colors ();
                 notebook#goto_page 1);
   dlg#misc#hide ()
 
@@ -206,7 +278,7 @@ let fileEntries ()=
 
 let editEntries ()=
   [
-    `I ("Traitement de l'image", fun _-> ());
+    `I ("Traitement de l'image", display_colors);
     `I ("Generer le terrain", fun _-> Modelisation.create_obj_file !file_path);
   ]
 
@@ -215,14 +287,6 @@ let toolEntries ()=
     `I ("Prendre une capture d'écran", fun _-> ());
     `I ("Prendre une capture d'écran sous", fun _-> ());
     `S;
-
-    `I ("Ajouter waypoint", fun _-> ());
-
-    `I ("Démarer le chemin", fun _-> ());
-
-    `I ("Mise à zéro du chemin", fun _-> ());
-
-
     `S;
 
     `I ("Monter carte", fun _-> ());
@@ -288,95 +352,57 @@ let toolbox = GToolbox.build_menu
 
 (* Option de Traitement *)
 
-let vboxOnglet2 =
-    GPack.vbox 
-  ~spacing:4
-  ~border_width:4
-  ~packing:onglet2#add ()
-
-
-let hboxcheck =
-  GPack.hbox
-  ~spacing:4
-  ~border_width:4
-  ~packing:vboxOnglet2#add ()
-
-let hboxOption =
-  GPack.hbox 
-  ~spacing:4
-  ~border_width:4
-  ~packing:vboxOnglet2#add ()
-
-let vboxOption1 =
+let button_grill =
   GPack.vbox
     ~spacing:4
     ~border_width:4
     ~homogeneous:false
-    ~packing:hboxOption#add ()
+    ~packing:hboxcheck#add ()
 
-let vboxOption2 =
+let update_grill =
   GPack.vbox
     ~spacing:4
     ~border_width:4
     ~homogeneous:false
-    ~packing:hboxOption#add ()
+    ~packing:hboxcheck#add ()
+
+(* GMisc.label > affiche la précision de l'échantillonnage *)
+let labelgrill =
+        let label = GMisc.label
+                ~text:"Pas de la grille."
+                ~packing:update_grill#add ()
+        in label
+
+
+(* GRange.scale > permet de régler la précision *)
+let fixgrill =
+        let button = GRange.scale `HORIZONTAL
+                ~adjustment:(GData.adjustment ~lower:5. ~upper:50. ())
+                ~value_pos:`LEFT
+                ~digits:0
+                ~inverted:false
+                ~packing:update_grill#add ()
+            in button
 
  (* Récupère l'état de filter_state pour savoir quelle fonction appliqué *)
-let set_filter () = match !filter_state with
+let set_filter _ = match !filter_state with
       true -> image#set_file !file_path; filter_state := false
-    | false -> Traitement_image.createGrill !file_path 25; filter_state := true;
+    | false -> Traitement_image.createGrill !file_path (int_of_float
+    (fixgrill#adjustment#value)); filter_state := true;
            image#set_file (!file_path^".grille.bmp");
            (Sys.remove (!file_path^".grille.bmp"))
 
-
-let validateColor color hauteur button () =
-    button#set_label (hauteur#text ^ " verrouillé");
-                   let (r,g,b) = color in
-                              Traitement_image.create_hauteur_list ((r+g+b)/3,(int_of_string
-                                 hauteur#text))
-
-
-    (* affiche la liste des couleurs trouvé *)
-let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
-        match l with
-         x::l -> let (r,g,b) = x in
-             let box = GPack.hbox
-                ~packing:(if(!acc mod 2 = 0) then vboxOption1#add
-                                            else vboxOption2#add) ()
-         in ignore (box); (acc := !acc + 1);
-               let entry = GEdit.entry
-                        ~text:""
-                        ~width:60
-                        ~height:30
-                        ~packing:box#add ()
-                and  button = GButton.button
-                        ~label:"Valider"
-                        ~packing:box#add ()
-                in
-                     let color = Printf.sprintf "#%02x%02x%02x" r g b
-                in
-                begin
-                  entry#misc#modify_base [`NORMAL, `NAME color];
-                 ignore(button#connect#clicked (validateColor (r,g,b) entry
-                 button));
-                  button#set_border_width 20;
-                end;
-                displayColors l
-        | _ -> ()
-
-let display_colors _ = if(!img_not_empty && not display_state) then
-        ((displayColors (Modelisation.get_list_colours !file_path));
-        img_not_empty := false)
-
-let check_button_grille =
+let check_button_grill =
             let button = GButton.check_button
        ~label:"Affichage de la grille"
        ~active:false
-      ~packing:hboxcheck#add () in
-            button#connect#clicked ~callback:(fun () ->  set_filter (); display_colors ())
+      ~packing:button_grill#add () in
+            button#connect#clicked set_filter
+
+
 
 (*** Button Open, About & Quit, Afficher un texte à l'écran ***)
-
+                      
 
 let file_button =
   let button = GButton.button
