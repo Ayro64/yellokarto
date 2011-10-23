@@ -1,4 +1,4 @@
-let out_channel_map = open_out "map3d.obj" 
+(*let out_channel_map = open_out "map3d.obj" *)
 let in_channel_map = open_in "map3d.obj"
   
 let string_of_char = String.make 1

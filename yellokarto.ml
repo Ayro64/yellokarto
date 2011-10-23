@@ -185,6 +185,7 @@ let validateColor color hauteur button _ =
                                  hauteur#text))
 
 
+let value_h = ref 50
     (* affiche la liste des couleurs trouvé *)
 let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
         match l with
@@ -206,8 +207,11 @@ let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
                 in
                 begin
                   entry#misc#modify_base [`NORMAL, `NAME color];
+                  (if((r,g,b) <> (0,0,255)) then entry#set_text
+                  (string_of_int(!value_h)) else (entry#set_text "0"); value_h :=
+                      !value_h + 50;
                  ignore(button#connect#clicked (validateColor (r,g,b) entry
-                 button));
+                 button)));
                   button#set_border_width 20;
                 end;
                 displayColors l
@@ -280,8 +284,7 @@ let fileEntries ()=
 
 let editEntries ()=
   [
-    `I ("Traitement de l'image", display_colors);
-    `I ("Generer le terrain", fun _-> Modelisation.create_obj_file !image_path_genuine);
+    `I ("Generer le terrain", fun _-> print_endline !image_path_genuine; Modelisation.create_obj_file !image_path_genuine);
   ]
 
 let toolEntries ()=
@@ -293,13 +296,6 @@ let toolEntries ()=
     `I ("Monter carte", fun _-> ());
 
     `I ("Déscendre carte", fun _-> ());
-
-    `S;
-
-    `I ("Démarrer la capture de video", fun _-> ());
-
-    `I ("Stopper la capture de video", fun _-> ());
-
   ]
 
 let infoEntries ()=

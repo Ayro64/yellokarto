@@ -29,12 +29,13 @@ let create_hauteur_txt (r,g,b,h) =
 
 (*Creation du fichier .obj a partir d'une liste de triples d'entiers BON*)
 let rec makeobj l () = match l with
-  | [] -> close_out out_channel
+  | [] -> print_endline "j'ai fermé le .obj";close_out out_channel
   | (x,y,z)::l -> begin
+ print_endline "ecriture dans obj";
       output_string out_channel 
-	("v "^ (string_of_int x)^".0"^" "^
-	   (string_of_int y)^".0"^" "^
-	   (string_of_int z)^".0"^"\n");
+	("v "^ (string_of_int x)^" "^
+	   (string_of_int y)^" "^
+	   (string_of_int z)^"\n");
       makeobj l ();
     end
 
