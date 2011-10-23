@@ -448,7 +448,7 @@ let textAccueil =
 
 let area = GlGtk.area
   [ `RGBA; `DOUBLEBUFFER; `BUFFER_SIZE 8 ;`DEPTH_SIZE 16]
-  ~width:800
+  ~width:978
   ~height:470
   ~show:true
   ~packing:layout_3D#add ()
