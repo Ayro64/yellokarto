@@ -181,7 +181,7 @@ let load_img text =
 let validateColor color hauteur button _ =
     button#set_label (hauteur#text ^ " verrouillé");
                    let (r,g,b) = color in
-                              Traitement_image.create_hauteur_list (r,g,b,(int_of_string
+                              Modelisation.create_hauteur_txt (r,g,b,(int_of_string
                                  hauteur#text))
 
 
