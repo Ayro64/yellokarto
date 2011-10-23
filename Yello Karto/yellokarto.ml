@@ -170,7 +170,8 @@ let openBox _ =
   if dlg#run() = `OPEN then ((file_path := (str_op(dlg#filename)));
                 Traitement_image.blackborder !file_path;
                 file_path := (!file_path^".bb.bmp");
-                (load_img !file_path));
+                load_img !file_path;
+                notebook#goto_page 1);
   dlg#misc#hide ()
 
 (* About button with credits, license, website *)
@@ -329,7 +330,7 @@ let set_filter () = match !filter_state with
 
 
 let validateColor color hauteur button () =
-    button#set_label (hauteur#text ^ " sauvegardé");
+    button#set_label (hauteur#text ^ " verrouillé");
                    let (r,g,b) = color in
                               Traitement_image.create_hauteur_list ((r+g+b)/3,(int_of_string
                                  hauteur#text))
