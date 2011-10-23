@@ -60,15 +60,15 @@ let rec string_to_pointlist = function
   | e::l -> (line_to_point e)::(string_to_pointlist l)
 
 (*conversion du fichier contenant les points en liste de points*)
-let textfile_to_pointlist =
+let textfile_to_pointlist () =
   let lines = ref [] in
     try
       while true; do
 	let a = input_line in_channel_points in
-      	  lines := a::(!lines); print_endline (string_of_int(List.length
-          !lines));
+      	  lines := a::(!lines); print_endline (string_of_int(List.length !lines));
       done; []
     with End_of_file -> close_in in_channel_points;
+    print_endline ("nombres d'elements dans string_to_pointlist: "^(string_of_int(List.length !lines)));
       (string_to_pointlist !lines)
 
 let line_to_color line=
@@ -98,7 +98,7 @@ let rec string_to_colorlist = function
   | [] -> []
   | e::l -> (line_to_color e)::(string_to_colorlist l)
 
-let createcolorlist =
+let createcolorlist () =
   let lines = ref [] in
     try
       while true; do
@@ -119,7 +119,7 @@ let twopto3p coord2d colorlist img =
   in tptotp coord2d colorlist (r,g,b)
 
 let dualtotriple img pointlist =
-  let colorlist = createcolorlist in
+  let colorlist = createcolorlist () in
   let rec d2t pl = match pl with
     | [] -> []
     | e::l -> (twopto3p e colorlist img)::(d2t l)
@@ -130,7 +130,7 @@ let create_obj_file filepath =
     close_out out_channel_color; close_out out_channel_points;print_endline 
     "j'ai bien fermé le fichier color et le fichier points";
   let img = loadImage filepath in
-  let l = textfile_to_pointlist in
+  let l = textfile_to_pointlist () in
      print_endline ("longueur de la liste textfile_to_pointlist :"^(string_of_int(List.length l)));
   let threepointlist = dualtotriple img l in
     makeobj threepointlist ()

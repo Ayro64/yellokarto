@@ -1,4 +1,4 @@
-(*let out_channel_map = open_out "map3d.obj" *)
+let out_channel_map = open_out "map3d.obj"
 let in_channel_map = open_in "map3d.obj"
   
 let string_of_char = String.make 1
@@ -31,7 +31,7 @@ let rec string2plist = function
   | e::l -> (line2p e)::(string2plist l)
       
       
-let getpoints =
+let getpoints () =
   let lines = ref [] in
     try
       while true; do
@@ -67,7 +67,7 @@ let display3D _ =
 
   GlDraw.begins `points;
 
-  iter getpoints;
+  iter (getpoints ());
 (*
   GlDraw.color (1., 0., 0.);
   GlDraw.vertex3 (1., 1., 1.);
