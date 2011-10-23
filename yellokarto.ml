@@ -284,7 +284,8 @@ let fileEntries ()=
 
 let editEntries ()=
   [
-    `I ("Generer le terrain", fun _-> print_endline !image_path_genuine; Modelisation.create_obj_file !image_path_genuine);
+      `I ("Generer le terrain", fun _-> print_endline !image_path_genuine;
+      notebook#goto_page 2 ; Modelisation.create_obj_file !image_path_genuine);
   ]
 
 let toolEntries ()=
@@ -426,7 +427,8 @@ let quit =
           ~stock:`QUIT
           ~packing:vboxInfo#add () in
       ignore(button#connect#clicked (fun () -> GMain.quit ();remove_img
-      !file_path; Sys.remove "color.txt"; Sys.remove "points.txt"));
+      !file_path; Sys.remove "color.txt"; Sys.remove "points.txt";
+      Sys.remove "map3d.obj"));
    button
 
 
