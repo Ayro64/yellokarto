@@ -16,6 +16,14 @@ let rec print_list = function
        print_list l
      end
 
+
+let hauteur = open_out "hauteur.txt"
+  
+let create_hauteur_list (a,b) =
+ begin
+   output_string hauteur (string_of_int a ^ "-" ^ string_of_int b ^ "\n");
+   print_endline((string_of_int a)^ " "^(string_of_int b));
+  end
 (* Dimensions d'une image *)
 let get_dims img =
   ((Sdlvideo.surface_info img).Sdlvideo.w, (Sdlvideo.surface_info img).Sdlvideo.h)
