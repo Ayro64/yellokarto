@@ -22,7 +22,7 @@ let line2p line =
     while(!i < String.length line) do
       s := !s^(string_of_char (line.[!i]));
       i := !i+1;
-done;
+    done;
     z := float_of_string !s;
     (!x, !y, !z)
       
@@ -40,16 +40,16 @@ let getpoints () =
       done; []
     with End_of_file -> close_in in_channel_map;
       (string2plist !lines)
-
-
+	
+	
 let time =
   let start = Unix.gettimeofday () in
     fun () -> Unix.gettimeofday () -. start
-
+      
 let rec iter = function
     [] -> ()
   | h::l -> GlDraw.vertex3 h; iter l
-
+      
 let initGL _ =
   GlMat.mode `projection;
   GlMat.load_identity ();
@@ -59,50 +59,16 @@ let initGL _ =
   GlMat.load_identity ();
   GlClear.clear [`depth ; `color];
   Gl.enable `depth_test
-
+    
 let display3D _ =
   GlClear.clear [`depth ; `color];
   GlMat.load_identity ();
-  GlMat.rotate ~angle:(50. *. time ()) ~x:0. ~y:0. ~z:0. ();
-
-  GlDraw.begins `points;
-
-  iter (getpoints ());
-(*
-  GlDraw.color (1., 0., 0.);
-  GlDraw.vertex3 (1., 1., 1.);
-  GlDraw.vertex3 (1., 1., -1.);
-  GlDraw.vertex3 (-1., 1., -1.);
-  GlDraw.vertex3 (-1., 1., 1.);
-
-  GlDraw.color (0., 1., 0.);
-  GlDraw.vertex3 (1., -1., 1.);
-  GlDraw.vertex3 (1., -1., -1.);
-  GlDraw.vertex3 (1., 1., -1.);
-  GlDraw.vertex3 (1., 1., 1.);
-
-  GlDraw.color (0., 0., 1.);
-  GlDraw.vertex3 (-1., -1., 1.);
-  GlDraw.vertex3 (-1., -1., -1.);
-  GlDraw.vertex3 (1., -1., -1.);
-  GlDraw.vertex3 (1., -1., 1.);
-
-  GlDraw.color (0.8, 0.1, 0.89);
-  GlDraw.vertex3 (-1., 1., -1.);
-  GlDraw.vertex3 (1., 1., -1.);
-  GlDraw.vertex3 (1., -1., -1.);
-  GlDraw.vertex3 (-1., -1., -1.);
+  GlMat.rotate ~angle:(50. *. time ()) ~x:0. ~y:0. ~z:(-1.) ();
   
-  GlDraw.color (0.7, 0.5, 0.12);
-  GlDraw.vertex3 (-1., 1., 1.);
-  GlDraw.vertex3 (-1., 1., -1.);
-  GlDraw.vertex3 (-1., -1., -1.);
-  GlDraw.vertex3 (-1., -1., 1.);
+  GlDraw.begins `points; 
+ 
+  iter (getpoints ());
 
-  GlDraw.color (0.05, 0.60, 1.);
-  GlDraw.vertex3 (-1., 1., 1.);
-  GlDraw.vertex3 (1., 1., 1.);
-  GlDraw.vertex3 (1., -1., 1.);
-  GlDraw.vertex3 (-1., -1., 1.);
-*)  GlDraw.ends ();
+  GlDraw.ends ();
+
   Gl.flush ()
