@@ -53,7 +53,7 @@ let initGL _ =
   GlMat.mode `projection;
   GlMat.load_identity ();
   GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 1000.);
-  GluMat.look_at (250., 250., 100.) (250., 250., 0.) ( 0., 0., 1.);
+  GluMat.look_at (600., 600., 600.) (0., 0., 0.) ( 0., 0., 1.);
   GlMat.mode `modelview;
   GlMat.load_identity ();
   GlClear.clear [`depth ; `color];
@@ -67,7 +67,7 @@ let display3D _ =
   GlDraw.begins `points;
 
   iter getpoints;
-
+(*
   GlDraw.color (1., 0., 0.);
   GlDraw.vertex3 (1., 1., 1.);
   GlDraw.vertex3 (1., 1., -1.);
@@ -103,6 +103,5 @@ let display3D _ =
   GlDraw.vertex3 (1., 1., 1.);
   GlDraw.vertex3 (1., -1., 1.);
   GlDraw.vertex3 (-1., -1., 1.);
-  GlDraw.ends ();
-
+*)  GlDraw.ends ();
   Gl.flush ()
