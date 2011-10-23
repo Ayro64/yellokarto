@@ -287,7 +287,6 @@ let toolEntries ()=
     `I ("Prendre une capture d'écran", fun _-> ());
     `I ("Prendre une capture d'écran sous", fun _-> ());
     `S;
-    `S;
 
     `I ("Monter carte", fun _-> ());
 
