@@ -22,6 +22,11 @@ let in_channel_points = open_in "points.txt"
 let out_channel_color = open_out "color.txt"
 let in_channel_color = open_in "color.txt"
 
+let create_hauteur_txt (r,g,b,h) =
+ begin
+   output_string out_channel_color (string_of_int r ^ " " ^ string_of_int g ^ " "^string_of_int b^" "^string_of_int h^"\n");
+  end    
+
 (*Creation du fichier .obj a partir d'une liste de triples d'entiers BON*)
 let rec makeobj l () = match l with
   | [] -> close_out out_channel
