@@ -6,6 +6,7 @@
 
 (*** Init ***)
 let display_state = false
+let image_path_genuine = ref ""
 let file_path = ref "" (* variable ou on stock le chemin de l'image*)
 let acc = ref 0
 let img_not_empty = ref false
@@ -239,6 +240,7 @@ let openBox _ =
   dlg#add_button_stock `CANCEL `CANCEL;
   dlg#add_select_button_stock `OPEN `OPEN;
   if dlg#run() = `OPEN then ((file_path := (str_op(dlg#filename)));
+                image_path_genuine := (str_op(dlg#filename));     
                 Traitement_image.blackborder !file_path;
                 file_path := (!file_path^".bb.bmp");
                 load_img !file_path;
@@ -279,7 +281,7 @@ let fileEntries ()=
 let editEntries ()=
   [
     `I ("Traitement de l'image", display_colors);
-    `I ("Generer le terrain", fun _-> Modelisation.create_obj_file !file_path);
+    `I ("Generer le terrain", fun _-> Modelisation.create_obj_file !image_path_genuine);
   ]
 
 let toolEntries ()=
@@ -427,12 +429,13 @@ let quit =
       let button = GButton.button
           ~stock:`QUIT
           ~packing:vboxInfo#add () in
-      ignore(button#connect#clicked (fun () -> GMain.quit ();remove_img !file_path));
+      ignore(button#connect#clicked (fun () -> GMain.quit ();remove_img
+      !file_path; Sys.remove "color.txt"; Sys.remove "points.txt"));
    button
 
 
 let textAccueil =
-        let text = open_in "presentation.txt" in
+        let text = open_in "text/presentation.txt" in
         let lenght = in_channel_length text in
         let str = String.create lenght in
         really_input text str 0 lenght;
