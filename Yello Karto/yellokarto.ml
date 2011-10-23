@@ -6,156 +6,157 @@
 
 (*** Init ***)
 let display_state = false
-let file_path = ref "images/Kassocié.png" (* variable ou on stock le chemin de l'image*)
+let file_path = ref "" (* variable ou on stock le chemin de l'image*)
 let acc = ref 0
 let img_not_empty = ref false
 let filter_state = ref false (*
-                              * Si state = 0, grille = false
-                              * Si state = 1, grille = true  
+                          * Si state = 0, grille = false
+                          * Si state = 1, grille = true  
                               *)
 let _ = GMain.init () (* initialisation du main *)
-  
-  
+
+let remove_img file = if(Sys.file_exists file) then (Sys.remove file)
+
 (* Fenêtre principale (non redimensionnable). *)
 let mainWindow = GWindow.window
   ~width:1024
   ~height:700
   ~resizable:false
   ~title:"Yello Karto" ()
-  
+
 (*** Menu du haut ***)
-(* première box ajouté a la fenetre mainWindow principale *)
+  (* première box ajouté a la fenetre mainWindow principale *)
 let vboxMenu =
   GPack.vbox
     ~spacing:4
     ~border_width:4
     ~packing:mainWindow#add ()
-    
+
 let menu_haut = GMenu.menu_bar ~packing:vboxMenu#add ()
-  
+
 let toolbar = GButton.toolbar
-  ~orientation:`HORIZONTAL
-  ~style:`BOTH
-  ~height:80
-  ~packing:vboxMenu#pack ()
-  
+        ~orientation:`HORIZONTAL
+        ~style:`BOTH
+        ~height:80
+        ~packing:vboxMenu#pack ()
+
 let vboxUnderToolbar =
   GPack.vbox
     ~spacing:4
     ~border_width:4
     ~packing:vboxMenu#add ()
-    
+
 let vboxOpen =
   GPack.vbox
     ~border_width:10
     ~spacing:100
     ~homogeneous:false
     ~packing:toolbar#add ()
-    
+
 let separator = 
-  GMisc.separator `VERTICAL
+    GMisc.separator `VERTICAL
     ~packing:toolbar#add ()
-    
+
 let banniere = 
   GMisc.image
     ~file:"images/montagne.jpg"
     ~width:800
     ~packing:toolbar#add()
-    
+
 let separator2 = 
-  GMisc.separator `VERTICAL
+    GMisc.separator `VERTICAL
     ~packing:toolbar#add ()
-    
+
 let vboxInfo =
-  GPack.vbox
+GPack.vbox
     ~border_width:10
     ~homogeneous:false
     ~packing:toolbar#add ()
-    
+
 (*** Ajout des onglets ***)
 (* NOTEBOOK *)
 let notebook = GPack.notebook
-  ~homogeneous_tabs:true
-  ~show_border:true
-  ~show_tabs:true
-  ~border_width:4
-  ~width:700
-  ~height:550
-  ~packing:vboxUnderToolbar#pack ()
-  
+      ~homogeneous_tabs:true
+      ~show_border:true
+      ~show_tabs:true
+      ~border_width:4
+     ~width:700
+      ~height:550
+     ~packing:vboxUnderToolbar#pack ()
+
 let text_onglet1 = GMisc.label ~text:"Présentation" ()
 let text_onglet2 = GMisc.label ~text:"Option de modélisation" ()
 let text_onglet3 = GMisc.label ~text:"Modélisation 3D" ()
-  
+
 (* ajoute les 4 onglets *)
 let onglet1 =
   GPack.hbox
     ~homogeneous:false
     ~spacing:4
     ~border_width:4 () 
-    
+
 let addonglet1 = notebook#insert_page
   ~tab_label:text_onglet1#coerce onglet1#coerce
-  
+
 let onglet2 =
   GPack.hbox
     ~homogeneous:false
     ~spacing:4
     ~border_width:4 ()
-    
+
 let addonglet2 = notebook#insert_page
   ~tab_label:text_onglet2#coerce onglet2#coerce
-  
-  
+
+
 let onglet3 =
   GPack.vbox
     ~homogeneous:false
     ~spacing:4
     ~border_width:4 ()
-    
+
 let addonglet3 = notebook#insert_page
   ~tab_label:text_onglet3#coerce onglet3#coerce
-  
+
 let window3D = GBin.frame
   ~label:"Rendu 3D"
   ~packing:onglet3#add ()
-  
+
 let layout_3D = GPack.fixed
   ~border_width:1
   ~packing:window3D#add ()
-  
-  
-  
+
+
+
 (*** Création des boites pour afficher les images  ***)
-  
-  
+
+
 (* fonction qui affiche l'image *)
 let image = 
   GMisc.image
-    ~file:!file_path
+  ~file:"images/Kassocié.png"
     ~packing:onglet2#add()
-    
-(*** Fonction qui charge l'image ***) 
+
+ (*** Fonction qui charge l'image ***) 
 (* fonction appelé lorsque l'on clique sur le bouton parcourir *)
-    
+
 let load_img text =
   (* met le lien du fichier dans file_path *)
   image#set_file text;
   img_not_empty := true;
   flush stdout
-    
+
 (*** action lier a menu en haut ***)
-    
+
 exception IsNone
-  
+
 let str_op = function
   | Some x -> x
   | _ -> raise IsNone
-      
+
 let img_filter = GFile.filter
   ~name:"Img File"
   ~patterns:["*.bmp"; "*.jpg"; "*.jpeg "; "*.png"]()
-  
+
 let openBox _ =
   let dlg = GWindow.file_chooser_dialog
     ~action:`OPEN
@@ -163,17 +164,17 @@ let openBox _ =
     ~position:`CENTER_ON_PARENT
     ~title: "Chargement d'une image"
     ~destroy_with_parent:true () in
-    dlg#set_filter img_filter;
-    dlg#add_button_stock `CANCEL `CANCEL;
-    dlg#add_select_button_stock `OPEN `OPEN;
-    if dlg#run() = `OPEN then ((file_path := (str_op(dlg#filename)));
-			       Traitement_image.blackborder !file_path;
-			       file_path := (!file_path^".bb.bmp");
-			       (load_img !file_path));
-    dlg#misc#hide ()
-      
+  dlg#set_filter img_filter;
+  dlg#add_button_stock `CANCEL `CANCEL;
+  dlg#add_select_button_stock `OPEN `OPEN;
+  if dlg#run() = `OPEN then ((file_path := (str_op(dlg#filename)));
+                Traitement_image.blackborder !file_path;
+                file_path := (!file_path^".bb.bmp");
+                (load_img !file_path));
+  dlg#misc#hide ()
+
 (* About button with credits, license, website *)
-      
+
 let about_button _ =
   let dialog = GWindow.about_dialog
     ~authors:
@@ -189,24 +190,23 @@ Matthieu \"The Mule\" Guyot de camy\n<matthieu.guyotdecamy@epita.fr>"]
     ~position:`CENTER_ON_PARENT
     ~parent:mainWindow
     ~destroy_with_parent:true () in
-    dialog#set_name "Yello Karto";
-    ignore(dialog#run ());
-    dialog#misc#hide ()
+dialog#set_name "Yello Karto";
+ignore(dialog#run ());
+dialog#misc#hide ()
 
-      
+
 (*** configuration de menu en haut ***)
 let fileEntries ()=
   [
     `I ("Ouvrir image",openBox);
-    `S;
-    `I ("Quitter",GMain.Main.quit);
+       `S;
+       `I ("Quitter",(remove_img !file_path;GMain.quit));
   ]
-    
+
 let editEntries ()=
   [
     `I ("Traitement de l'image", fun _-> ());
-    `I ("Generer le terrain", (fun _ -> 
-	(Modelisation.create_obj_file !file_path)));
+    `I ("Generer le terrain", fun _-> Modelisation.create_obj_file !file_path);
   ]
 
 let toolEntries ()=
@@ -214,253 +214,250 @@ let toolEntries ()=
     `I ("Prendre une capture d'écran", fun _-> ());
     `I ("Prendre une capture d'écran sous", fun _-> ());
     `S;
-    
+
     `I ("Ajouter waypoint", fun _-> ());
 
     `I ("Démarer le chemin", fun _-> ());
-    
+
     `I ("Mise à zéro du chemin", fun _-> ());
-    
-    
+
+
     `S;
-    
+
     `I ("Monter carte", fun _-> ());
-    
+
     `I ("Déscendre carte", fun _-> ());
-    
+
     `S;
 
     `I ("Démarrer la capture de video", fun _-> ());
-    
+
     `I ("Stopper la capture de video", fun _-> ());
-    
+
   ]
-    
+
 let infoEntries ()=
   [
     `I ("A propos",about_button);
   ]
-    
+
 let optionList = GMenu.menu_item
-  ~label:"Fichier"
-  ~packing:menu_haut#append
-  ()
-  
+                     ~label:"Fichier"
+                     ~packing:menu_haut#append
+                     ()
+
 let optionEdit = GMenu.menu_item
-  ~label:"Edition"
-  ~packing:menu_haut#append
-  ()
-  
+                     ~label:"Edition"
+                     ~packing:menu_haut#append
+                     ()
+
 let optionTool = GMenu.menu_item
-  ~label:"Outils"
-  ~packing:menu_haut#append
-  ()
-  
+                     ~label:"Outils"
+                     ~packing:menu_haut#append
+                     ()
+
 let optionInfo = GMenu.menu_item
-  ~label:"?"
-  ~packing:menu_haut#append
-  ()
-  
+                     ~label:"?"
+                     ~packing:menu_haut#append
+                     ()
+
 let menu_option = GMenu.menu ~packing:optionList#set_submenu ()
 let menu_edit = GMenu.menu ~packing:optionEdit#set_submenu ()
 let menu_tool = GMenu.menu ~packing:optionTool#set_submenu ()
 let menu_info = GMenu.menu ~packing:optionInfo#set_submenu ()
-  
+
 let toolbox = GToolbox.build_menu
-  menu_option
-  ~entries:(fileEntries ())
-  
-  
+      menu_option
+      ~entries:(fileEntries ())
+
+
 let toolbox = GToolbox.build_menu
-  menu_edit
-  ~entries:(editEntries ())
-  
+      menu_edit
+      ~entries:(editEntries ())
+
 let toolbox = GToolbox.build_menu
-  menu_tool
-  ~entries:(toolEntries ())
-  
+      menu_tool
+      ~entries:(toolEntries ())
+
 let toolbox = GToolbox.build_menu
-  menu_info
-  ~entries:(infoEntries ())
-  
-  
-  
+      menu_info
+      ~entries:(infoEntries ())
+
+
+
 (* Option de Traitement *)
-  
+
 let vboxOnglet2 =
-  GPack.vbox 
-    ~spacing:4
-    ~border_width:4
-    ~packing:onglet2#add ()
-    
-    
+    GPack.vbox 
+  ~spacing:4
+  ~border_width:4
+  ~packing:onglet2#add ()
+
+
 let hboxcheck =
   GPack.hbox
-    ~spacing:4
-    ~border_width:4
-    ~packing:vboxOnglet2#add ()
-    
+  ~spacing:4
+  ~border_width:4
+  ~packing:vboxOnglet2#add ()
+
 let hboxOption =
   GPack.hbox 
-    ~spacing:4
-    ~border_width:4
-    ~packing:vboxOnglet2#add ()
-    
+  ~spacing:4
+  ~border_width:4
+  ~packing:vboxOnglet2#add ()
+
 let vboxOption1 =
   GPack.vbox
     ~spacing:4
     ~border_width:4
     ~homogeneous:false
     ~packing:hboxOption#add ()
-    
+
 let vboxOption2 =
   GPack.vbox
     ~spacing:4
     ~border_width:4
     ~homogeneous:false
     ~packing:hboxOption#add ()
-    
-(* Récupère l'état de filter_state pour savoir quelle fonction appliqué *)
+
+ (* Récupère l'état de filter_state pour savoir quelle fonction appliqué *)
 let set_filter () = match !filter_state with
-    true -> image#set_file !file_path; filter_state := false
-  | false -> Traitement_image.createGrill !file_path 25; filter_state := true;
-      image#set_file (!file_path^".grille.bmp");
-      (Sys.remove (!file_path^".grille.bmp"))
-	
-	
-let validateColor color altitude button () =
-  button#set_label (altitude#text ^ " sauvegardé...")
-    (*  let (r,g,b) = color in
-        imageToParse#set_listColorsRGB (((r+g+b)/3,
-	int_of_string altitude#text)::(imageToParse#get_listColorsRGB))
-    (*print_endline (string_of_int
-        * (List.length
-        * imageToParse#get_listColorsRGB))*)*)
-    
-    
-(* affiche la liste des couleurs trouvé *)
+      true -> image#set_file !file_path; filter_state := false
+    | false -> Traitement_image.createGrill !file_path 25; filter_state := true;
+           image#set_file (!file_path^".grille.bmp");
+           (Sys.remove (!file_path^".grille.bmp"))
+
+
+let validateColor color hauteur button () =
+    button#set_label (hauteur#text ^ " sauvegardé");
+                   let (r,g,b) = color in
+                              Traitement_image.create_hauteur_list ((r+g+b)/3,(int_of_string
+                                 hauteur#text))
+
+
+    (* affiche la liste des couleurs trouvé *)
 let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
-  match l with
-      x::l -> let (r,g,b) = x in
-      let box = GPack.hbox
-        ~packing:(if(!acc mod 2 = 0) then vboxOption1#add
-                  else vboxOption2#add) ()
-      in ignore (box); (acc := !acc + 1);
-        let entry = GEdit.entry
-          ~text:""
-          ~width:60
-          ~height:30
-          ~packing:box#add ()
-        and  button = GButton.button
-          ~label:"Valider"
-          ~packing:box#add ()
-        in
-        let color = Printf.sprintf "#%02x%02x%02x" r g b
-        in
-          begin
-            entry#misc#modify_base [`NORMAL, `NAME color];
-            ignore(button#connect#clicked ~callback:(validateColor (r,g,b)
-						       entry button));
-            button#set_border_width 20;
-          end;
-          displayColors l
-    | _ -> ()
-	
+        match l with
+         x::l -> let (r,g,b) = x in
+             let box = GPack.hbox
+                ~packing:(if(!acc mod 2 = 0) then vboxOption1#add
+                                            else vboxOption2#add) ()
+         in ignore (box); (acc := !acc + 1);
+               let entry = GEdit.entry
+                        ~text:""
+                        ~width:60
+                        ~height:30
+                        ~packing:box#add ()
+                and  button = GButton.button
+                        ~label:"Valider"
+                        ~packing:box#add ()
+                in
+                     let color = Printf.sprintf "#%02x%02x%02x" r g b
+                in
+                begin
+                  entry#misc#modify_base [`NORMAL, `NAME color];
+                 ignore(button#connect#clicked (validateColor (r,g,b) entry
+                 button));
+                  button#set_border_width 20;
+                end;
+                displayColors l
+        | _ -> ()
+
 let display_colors _ = if(!img_not_empty && not display_state) then
-  ((displayColors (Modelisation.get_list_colours !file_path));
-   img_not_empty := false)
-    
+        ((displayColors (Modelisation.get_list_colours !file_path));
+        img_not_empty := false)
+
 let check_button_grille =
-  let button = GButton.check_button
-    ~label:"Affichage de la grille"
-    ~active:false
-    ~packing:hboxcheck#add () in
-    button#connect#clicked ~callback:(fun () ->  set_filter (); display_colors ())
-      
+            let button = GButton.check_button
+       ~label:"Affichage de la grille"
+       ~active:false
+      ~packing:hboxcheck#add () in
+            button#connect#clicked ~callback:(fun () ->  set_filter (); display_colors ())
+
 (*** Button Open, About & Quit, Afficher un texte à l'écran ***)
-      
-      
+
+
 let file_button =
   let button = GButton.button
     ~label:"Parcourir"
     ~stock:`OPEN
     ~packing:vboxOpen#add () in 
-    (* On met une petite image kikoo pour l'ouverture du bouton *)
+  (* On met une petite image kikoo pour l'ouverture du bouton *)
     ignore (GMisc.image ~stock:`OPEN ~packing:button#set_image ());
-    (* permet d'ouvrir une fenetre Parcourir  *)
+  (* permet d'ouvrir une fenetre Parcourir  *)
     ignore (button#connect#clicked openBox);
-    button 
-      
-      
+  button 
+
+
 let about =
-  let button = GButton.button 
-    ~stock:`ABOUT 
-    ~packing:vboxInfo#add() in
-    ignore (GMisc.image ~stock:`ABOUT ~packing:button#set_image ());
-    ignore (button#connect#clicked about_button);
-    button
-      
+	let button = GButton.button 
+	~stock:`ABOUT 
+	~packing:vboxInfo#add() in
+  ignore (GMisc.image ~stock:`ABOUT ~packing:button#set_image ());
+  ignore (button#connect#clicked about_button);
+  button
+
 let quit = 
-  let button = GButton.button
-    ~stock:`QUIT
-    ~packing:vboxInfo#add () in
-    ignore( button#connect#clicked (fun () ->  (GMain.quit ();(Sys.remove
-								 !file_path))));
-    button
-      
-      
+      let button = GButton.button
+          ~stock:`QUIT
+          ~packing:vboxInfo#add () in
+      ignore(button#connect#clicked (fun () -> GMain.quit ();remove_img !file_path));
+   button
+
+
 let textAccueil =
-  let text = open_in "presentation.txt" in
-  let lenght = in_channel_length text in
-  let str = String.create lenght in
-    really_input text str 0 lenght;
-    close_in text;
-    let buffer = GText.buffer () in
-      buffer#set_text (str);
-      GMisc.label
-        ~text:str
-        ~width:900
-        ~line_wrap:true
-        ~packing:onglet1#add ()
-	
+        let text = open_in "presentation.txt" in
+        let lenght = in_channel_length text in
+        let str = String.create lenght in
+        really_input text str 0 lenght;
+        close_in text;
+        let buffer = GText.buffer () in
+                buffer#set_text (str);
+                GMisc.label
+                        ~text:str
+                        ~width:900
+                        ~line_wrap:true
+                        ~packing:onglet1#add ()
+
 let area = GlGtk.area
   [ `RGBA; `DOUBLEBUFFER; `BUFFER_SIZE 8 ;`DEPTH_SIZE 16]
-  ~width:978
+  ~width:800
   ~height:470
   ~show:true
   ~packing:layout_3D#add ()
-  
+
 let initGLenable = ref false
 let stopinitGL = ref false
-  
+
 let rec initthisgl () =
-  if(notebook#current_page = 2) then
-    (if not(!initGLenable) then
-       (notebook#goto_page 2;
-	area#make_current ();
-	Moteur3D.initGL ();
-	initGLenable := true;
-	stopinitGL := true);
-     ignore(GMain.Timeout.add ~ms:50 ~callback:(fun () -> initthisgl();false)))
-      
-      
+if(notebook#current_page = 2) then
+  (if not(!initGLenable) then
+  (notebook#goto_page 2;
+    area#make_current ();
+    Moteur3D.initGL ();
+    initGLenable := true;
+    stopinitGL := true);
+   ignore(GMain.Timeout.add ~ms:50 ~callback:(fun () -> initthisgl();false)))
+  
+  
 let refresh_area () = 
-  if (notebook#current_page = 2) then 
-    begin
-      area#make_current ();
-      Moteur3D.display3D();
-      area#swap_buffers()
-    end
-      
-      
+ if (notebook#current_page = 2) then 
+        begin
+          area#make_current ();
+          Moteur3D.display3D();
+          area#swap_buffers()
+        end
+    
+
 let init_area ()=
   ignore(GMain.Timeout.add ~ms:5 ~callback:(fun () -> initthisgl();not(!stopinitGL)));
-  ignore(GMain.Timeout.add ~ms:30 ~callback:(fun () -> refresh_area();true));
-  ignore(area#connect#display ~callback:(fun () ->refresh_area()))
+    ignore(GMain.Timeout.add ~ms:30 ~callback:(fun () -> refresh_area();true));
+    ignore(area#connect#display ~callback:(fun () ->refresh_area()))
+
     
-    
-let _ =
-  ignore(mainWindow#connect#destroy ~callback:GMain.quit);
-  init_area ();
-  mainWindow#show ();
-  GMain.main ()
+   let _ =
+       ignore(mainWindow#connect#destroy (remove_img !file_path;GMain.quit));
+       init_area ();
+ mainWindow#show ();
+ GMain.main ()
+

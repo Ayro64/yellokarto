@@ -1,4 +1,4 @@
-let in_channel_map = open_in "map3d.obj"
+let in_channel_map = open_in "fichier.obj"
   
 let string_of_char = String.make 1
   
@@ -68,7 +68,7 @@ let display3D _ =
 
   iter getpoints;
 
-  (*GlDraw.color (1., 0., 0.);
+  GlDraw.color (1., 0., 0.);
   GlDraw.vertex3 (1., 1., 1.);
   GlDraw.vertex3 (1., 1., -1.);
   GlDraw.vertex3 (-1., 1., -1.);
@@ -102,7 +102,7 @@ let display3D _ =
   GlDraw.vertex3 (-1., 1., 1.);
   GlDraw.vertex3 (1., 1., 1.);
   GlDraw.vertex3 (1., -1., 1.);
-  GlDraw.vertex3 (-1., -1., 1.);*)
+  GlDraw.vertex3 (-1., -1., 1.);
   GlDraw.ends ();
 
   Gl.flush ()
