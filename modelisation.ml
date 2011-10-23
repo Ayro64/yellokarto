@@ -65,8 +65,7 @@ let textfile_to_pointlist () =
     try
       while true; do
 	let a = input_line in_channel_points in
-      	  lines := a::(!lines); print_endline 
-	    (string_of_int(List.length !lines));
+      	  lines := a::(!lines);
       done; []
     with End_of_file -> close_in in_channel_points;
       (string_to_pointlist !lines)
