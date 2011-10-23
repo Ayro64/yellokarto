@@ -15,9 +15,11 @@ let show img dst =
 let out_channel = open_out "map3d.obj"
 
 (* canal d'entree pour recuperer les points de la map 2d*)
+let out_channel_points = open_out "points.txt"
 let in_channel_points = open_in "points.txt"
 
 (*canal d'entree pour recuperer la hauteur relative a chaque couleur*)
+let out_channel_color = open_out "color.txt"
 let in_channel_color = open_in "color.txt"
 
 (*Creation du fichier .obj a partir d'une liste de triples d'entiers BON*)
@@ -118,6 +120,7 @@ let dualtotriple img pointlist =
 
 (*creation du fichier obj*)
 let create_obj_file filepath =
+    close_out out_channel_color; print_endline "j'ai bien fermé le fichier color";
   let img = loadImage filepath in
   let l = textfile_to_pointlist in
   let threepointlist = dualtotriple img l in
