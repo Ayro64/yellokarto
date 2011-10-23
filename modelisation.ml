@@ -15,7 +15,7 @@ let show img dst =
 let out_channel = open_out "map3d.obj"
 
 (* canal d'entree pour recuperer les points de la map 2d*)
-let out_channel_points = open_out "points.txt"
+let out_channel_points = open_out "points.txt" 
 let in_channel_points = open_in "points.txt"
 
 (*canal d'entree pour recuperer la hauteur relative a chaque couleur*)
@@ -65,7 +65,8 @@ let textfile_to_pointlist =
     try
       while true; do
 	let a = input_line in_channel_points in
-      	  lines := a::(!lines);
+      	  lines := a::(!lines); print_endline (string_of_int(List.length
+          !lines));
       done; []
     with End_of_file -> close_in in_channel_points;
       (string_to_pointlist !lines)
@@ -126,10 +127,11 @@ let dualtotriple img pointlist =
 
 (*creation du fichier obj*)
 let create_obj_file filepath =
-    close_out out_channel_color; print_endline "j'ai bien fermé le fichier color";
+    close_out out_channel_color; close_out out_channel_points;print_endline 
+    "j'ai bien fermé le fichier color et le fichier points";
   let img = loadImage filepath in
   let l = textfile_to_pointlist in
-     print_endline (string_of_int(List.length l));
+     print_endline ("longueur de la liste textfile_to_pointlist :"^(string_of_int(List.length l)));
   let threepointlist = dualtotriple img l in
     makeobj threepointlist ()
 
