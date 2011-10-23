@@ -129,6 +129,7 @@ let create_obj_file filepath =
     close_out out_channel_color; print_endline "j'ai bien fermé le fichier color";
   let img = loadImage filepath in
   let l = textfile_to_pointlist in
+     print_endline (string_of_int(List.length l));
   let threepointlist = dualtotriple img l in
     makeobj threepointlist ()
 
