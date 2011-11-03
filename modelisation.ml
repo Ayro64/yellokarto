@@ -15,17 +15,10 @@ let show img dst =
 let out_channel = open_out "map3d.obj"
 
 let list_points = ref []
+let colours_list = ref []
 
-(*canal d'entree pour recuperer la hauteur relative a chaque couleur*)
-let out_channel_color = open_out "color.txt"
-let in_channel_color = open_in "color.txt"
-  
-let create_height_txt (r,g,b,h) =
-  begin
-    output_string out_channel_color (string_of_int r ^ " " ^ 
-    string_of_int g ^ " "^string_of_int b^" "^string_of_int h^"\n");
-  end    
-    
+let create_height (r,g,b,h) = colours_list := (r,g,b,h)::(!colours_list)
+
 (*Creation du fichier .obj a partir d'une liste de triples d'entiers BON*)
 let rec makeobj l () = match l with
   | [] -> close_out out_channel
@@ -36,50 +29,13 @@ let rec makeobj l () = match l with
 	   (string_of_int z)^"\n");
       makeobj l ();
     end
-      
+(*      
 let string_of_char = String.make 1
-  
-let textfile_to_pointlist () =
+*)  
+let to_pointlist () =
      list_points := Traitement_image.(!points_list);
       !list_points
-	
-let line_to_color line=
-  let i = ref 0 and r = ref 0 and g = ref 0 and b = ref 0 and h = ref 0 in
-    while(line.[!i] <> ' ') do
-      r := 10*(!r) + (int_of_string(string_of_char (line.[!i])));
-      i := !i+1;
-    done;
-    i := !i+1;
-    while(line.[!i] <> ' ') do
-      g := 10*(!g) + (int_of_string(string_of_char (line.[!i])));
-      i := !i+1;
-    done;
-    i := !i+1;
-    while(line.[!i] <> ' ') do
-      b := 10*(!b) + (int_of_string(string_of_char (line.[!i])));
-      i := !i+1;
-    done;
-    i := !i+1;
-    while(!i < String.length line) do
-      h := 10*(!h) + (int_of_string(string_of_char (line.[!i])));
-      i := !i+1;
-    done;
-    (!r,!g, !b, !h)
-      
-let rec string_to_colorlist = function
-  | [] -> []
-  | e::l -> (line_to_color e)::(string_to_colorlist l)
-      
-let createcolorlist () =
-  let lines = ref [] in
-    try
-      while true; do
-	let a = input_line in_channel_color in
-	  lines := a::(!lines);
-      done; []
-    with End_of_file -> close_in in_channel_color;
-      (string_to_colorlist !lines)
-	
+
 let twopto3p coord2d colorlist img =
   let (x,y) = coord2d in
   let (r,g,b) = (Sdlvideo.get_pixel_color img x y) in
@@ -93,17 +49,15 @@ let twopto3p coord2d colorlist img =
   in tptotp coord2d colorlist (r,g,b)
        
 let dualtotriple img pointlist =
-    let colorlist = createcolorlist () in
-  let rec d2t pl = match pl with
+    let rec d2t pl = match pl with
     | [] -> []
-    | e::l -> (twopto3p e colorlist img)::(d2t l)
-  in d2t pointlist
+    | e::l -> (twopto3p e !colours_list img)::(d2t l)
+in d2t pointlist
        
 
 let create_obj_file filepath =
-  close_out out_channel_color;
   let img = loadImage filepath in
-  let l = textfile_to_pointlist () in
+  let l = to_pointlist () in
   let threepointlist = dualtotriple img l in
     makeobj threepointlist ()
      
