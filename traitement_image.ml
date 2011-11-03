@@ -41,19 +41,7 @@ let blackborder filepath  =
       image2bb img;
       saveImage img (filepath^".bb.bmp");
   end
-    
-(* Creation de la grille *)
-    
-let rec is_in_list elt list = match list with
-  |[] -> false
-  |e::l when e=elt -> true
-  |e::l -> is_in_list elt l
-     
-let add_if_new elt list = match (elt, list) with
-  |(x,l) when (not(is_in_list x l)) ->  x::l
-  |(x,l) -> l
-    
-let points_list = ref []
+    let points_list = ref []
 
 let clean_point_list () = if ((List.length !points_list) > 0) then (points_list := [])
 
@@ -62,7 +50,7 @@ let image2grill img n = clean_point_list ();
     let grill image j i =
       begin
 	      if(Sdlvideo.get_pixel_color image j i = (0,0,0)) then
-		points_list := add_if_new (j,i) !points_list;
+		points_list := (j,i)::(!points_list);
 	      Sdlvideo.put_pixel_color image j i (0,0,0);
       end in
         for i=0 to (h-1) do
