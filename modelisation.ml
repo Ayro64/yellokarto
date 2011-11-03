@@ -13,11 +13,9 @@ let show img dst =
       
 (* canal de sortie pour la creation/ecriture du fichier obj*)
 let out_channel = open_out "map3d.obj"
-  
-(* canal d'entree pour recuperer les points de la map 2d*)
-let out_channel_points = open_out "points.txt" 
-let in_channel_points = open_in "points.txt"
-  
+
+let list_points = ref []
+
 (*canal d'entree pour recuperer la hauteur relative a chaque couleur*)
 let out_channel_color = open_out "color.txt"
 let in_channel_color = open_in "color.txt"
@@ -41,34 +39,9 @@ let rec makeobj l () = match l with
       
 let string_of_char = String.make 1
   
-(*conversion d'une ligne de texte en couple d'entiers*)
-let line_to_point line =
-  let i = ref 0 and a = ref 0 and b = ref 0 in
-    while(line.[!i] <> '-') do
-      a := 10*(!a) + (int_of_string(string_of_char (line.[!i])));
-      i := !i+1;
-    done;
-    i := !i+1;
-    while(!i < String.length line) do
-      b := 10*(!b) + (int_of_string(string_of_char (line.[!i])));
-      i := !i+1;
-    done;
-    (!a,!b)
-      
-let rec string_to_pointlist = function
-  | [] -> []
-  | e::l -> (line_to_point e)::(string_to_pointlist l)
-      
-(*conversion du fichier contenant les points en liste de points*)
 let textfile_to_pointlist () =
-  let lines = ref [] in
-    try
-      while true; do
-	let a = input_line in_channel_points in
-      	  lines := a::(!lines);
-      done; []
-    with End_of_file -> close_in in_channel_points;
-      (string_to_pointlist !lines)
+     list_points := Traitement_image.(!points_list);
+      !list_points
 	
 let line_to_color line=
   let i = ref 0 and r = ref 0 and g = ref 0 and b = ref 0 and h = ref 0 in
@@ -120,20 +93,20 @@ let twopto3p coord2d colorlist img =
   in tptotp coord2d colorlist (r,g,b)
        
 let dualtotriple img pointlist =
-  let colorlist = createcolorlist () in
+    let colorlist = createcolorlist () in
   let rec d2t pl = match pl with
     | [] -> []
     | e::l -> (twopto3p e colorlist img)::(d2t l)
   in d2t pointlist
        
-(*creation du fichier obj*)
+
 let create_obj_file filepath =
-  close_out out_channel_color; close_out out_channel_points;
+  close_out out_channel_color;
   let img = loadImage filepath in
   let l = textfile_to_pointlist () in
   let threepointlist = dualtotriple img l in
     makeobj threepointlist ()
-      
+     
 (* Dimensions d'une image *)
 let get_dims img =
   ((Sdlvideo.surface_info img).Sdlvideo.w, 
