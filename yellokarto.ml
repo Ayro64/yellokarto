@@ -181,8 +181,7 @@ let load_img text =
 let validateColor color height button _ =
   button#set_label (height#text ^ " verrouillé");
   let (r,g,b) = color in
-    Modelisation.create_height_txt (r,g,b,(int_of_string
-					      height#text))
+    Modelisation.create_height (r,g,b,(int_of_string height#text))
       
 let button_color_list = ref []    
   (* affiche la liste des couleurs trouvé *)
@@ -443,7 +442,7 @@ let quit =
     ~stock:`QUIT
     ~packing:vboxInfo#add () in
     ignore(button#connect#clicked (fun () -> GMain.quit ();remove_img
-    !file_path; Sys.remove "color.txt"; Sys.remove "map3d.obj"));
+    !file_path; Sys.remove "map3d.obj"));
     button
       
       
