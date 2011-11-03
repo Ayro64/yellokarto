@@ -184,6 +184,7 @@ let validateColor color height button _ =
     Modelisation.create_height_txt (r,g,b,(int_of_string
 					      height#text))
       
+let button_color_list = ref []    
   (* affiche la liste des couleurs trouvé *)
 let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
    let value_h = ref (((List.length l)-1)*50) in
@@ -209,13 +210,18 @@ let rec displayColors l =  ignore (Modelisation.get_list_colours (!file_path));
             (if((r,g,b) <> (0,0,255)) then entry#set_text
                (string_of_int(!value_h)) else (entry#set_text "0");
                value_h :=  !value_h - 50;
-             ignore(button#connect#clicked (validateColor (r,g,b) entry
-					      button)));
+            ignore(button_color_list := ((r,g,b), entry, button)::(!button_color_list));
+             ignore(button#connect#clicked (validateColor (r,g,b) entry button)));
             button#set_border_width 20;
           end;
           displayColors l
     | _ -> ()
-	
+
+let rec validate_all = function
+    |((r,g,b), entry, button)::l -> validateColor (r,g,b) entry button (); validate_all l
+    | _ -> ()
+
+
 let display_colors _ = if(!img_not_empty && not display_state) then
   ((displayColors (Modelisation.get_list_colours !file_path));
    img_not_empty := false)
@@ -289,6 +295,8 @@ let fileEntries ()=
     
 let editEntries ()=
   [
+    `I ("Valider toutes les hauteurs", fun _ -> validate_all !button_color_list);
+
     `I ("Générer le terrain", fun _-> notebook#goto_page 2; 
 	  Modelisation.create_obj_file !image_path_genuine);
   ]
@@ -435,8 +443,7 @@ let quit =
     ~stock:`QUIT
     ~packing:vboxInfo#add () in
     ignore(button#connect#clicked (fun () -> GMain.quit ();remove_img
-	 !file_path; Sys.remove "color.txt"; Sys.remove "points.txt";
-	  Sys.remove "map3d.obj"));
+    !file_path; Sys.remove "color.txt"; Sys.remove "map3d.obj"));
     button
       
       
