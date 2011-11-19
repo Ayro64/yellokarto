@@ -33,7 +33,7 @@ let rec makeobj l () = match l with
 let string_of_char = String.make 1
 *)  
 let to_pointlist () =
-     list_points := Traitement_image.(!points_list);
+     list_points := !Traitement_image.points_list;
       !list_points
 
 let twopto3p coord2d colorlist img =
