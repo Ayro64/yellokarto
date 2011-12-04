@@ -15,6 +15,15 @@ let get_dims img =
 let level (r,g,b) = float_of_int(r) *. 0.3 +.  float_of_int(g) *. 0.59  +.
   float_of_int(b) *. 0.11
   
+let rec is_in_list elt list = match list with
+  |[] -> false
+  |e::l when e=elt -> true
+  |e::l -> is_in_list elt l
+     
+let add_if_new elt list = match (elt, list) with
+  |(x,l) when (not(is_in_list x l)) ->  x::l
+  |(x,l) -> l
+
   
 (* séparation des couleurs avec ligne noire *)
   
@@ -50,7 +59,7 @@ let image2grill img n = clean_point_list ();
     let grill image j i =
       begin
 	      if(Sdlvideo.get_pixel_color image j i = (0,0,0)) then
-		points_list := (j,i)::(!points_list);
+		points_list := add_if_new (j,i) (!points_list);
 	      Sdlvideo.put_pixel_color image j i (0,0,0);
       end in
         for i=0 to (h-1) do
