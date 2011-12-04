@@ -128,22 +128,20 @@ let time =
 let distance (p1x, p1y, _) (p2x, p2y, _) =
   (p1x -. p2x) *. (p1x -. p2x) +. (p1y -. p2y) *. (p1y -. p2y)
     
-let tegal t1 = function
+let equalTriangles t1 = function
   | [p11;p12;p13] ->
       begin
 	match t1 with
 	  | [p21;p22;p23] ->
-              (
-		(p11 = p21 && p12 = p22 && p13 = p23)
+              ((p11 = p21 && p12 = p22 && p13 = p23)
 		|| (p11 = p21 && p12 = p23 && p13 = p22)
 		|| (p11 = p22 && p12 = p21 && p13 = p23)
 		|| (p11 = p22 && p12 = p23 && p13 = p21)
 		|| (p11 = p23 && p12 = p21 && p13 = p22)
-		|| (p11 = p23 && p12 = p22 && p13 = p21)
-              )
-	  | _ -> failwith "Ce n'est pas un triangle"
+		|| (p11 = p23 && p12 = p22 && p13 = p21))
+	  | _ -> failwith "Not a triangle"
       end
-  | _ -> failwith "Ce n'est pas un triangle"
+  | _ -> failwith "Not a triangle"
       
 let segal (a, b) t =
   let l = ref t in
@@ -154,31 +152,31 @@ let segal (a, b) t =
       List.length !l = 1;
     end
       
-let orthogonal (x1, y1) (x2, y2) =
+let median (x1, y1) (x2, y2) =
   let (mx, my) = ((x1 +. x2) /. 2., (y1 +. y2) /. 2.)
   and coef = -.(x2 -. x1) /. (y2 -. y1) in
   let sup = my -. mx *. coef in
     (coef, sup)
       
-let rec circleCenter = function
+let rec circleOfCenter = function
   | [(t1x, t1y, _);(t2x, t2y, _);(t3x, t3y, _)] ->
       if t1y -.t2y = 0. && t2y -.t3y = 0.then
-	failwith "Triangle plat"
+	failwith "Flat triangle"
       else if t2y -. t3y = 0. then
-	circleCenter [(t2x,t2y,0.);(t3x,t3y,0.);(t1x,t1y,0.)]
+	circleOfCenter [(t2x,t2y,0.);(t3x,t3y,0.);(t1x,t1y,0.)]
       else if t1y -. t2y = 0. then
 	let x = (t1x +. t2x) /. 2. in
-	let (a, b) = orthogonal (t1x, t1y) (t3x, t3y) in
+	let (a, b) = median (t1x, t1y) (t3x, t3y) in
 	  (x, a *. x +. b)
       else
-	let (a1, b1) = orthogonal (t1x, t1y) (t2x, t2y)
-	and (a2, b2) = orthogonal (t1x, t1y) (t3x, t3y) in
+	let (a1, b1) = median (t1x, t1y) (t2x, t2y)
+	and (a2, b2) = median (t1x, t1y) (t3x, t3y) in
 	let x = (b2 -. b1) /. (a1 -. a2) in
 	  (x, a1 *. x +. b1)
-  | _ -> failwith "Ce n'est pas un triangle"
+  | _ -> failwith "Not a triangle"
       
 let rec pointInCircle r (cx,cy) t = function
-    [] -> None
+  |  [] -> None
   | ((px, py, _) as p)::_ when int_of_float r > int_of_float
       ((cx -. px) *. (cx -. px) +. (cy -. py) *. (cy -. py)) ->
       Some (p,t)
@@ -190,15 +188,14 @@ let lastPoint p1 p2 t =
     l := List.filter (comp p1) !l;
     l := List.filter (comp p2) !l;
     if List.length !l <> 1 then
-      print_endline ("Triangle non complet " ^ string_of_int
-		       (List.length !l));
+      print_endline ("Incomplete triangle");
     match !l with
 	e::l -> e
-      | _ -> print_endline "Triangle incorrect";
+      | _ -> print_endline "Incorrect triangle";
 	  p1
 	    
 let rec inCircle r c t ts = function
-    [] -> ()
+  | [] -> ()
   | [p1;p2;p3] as e::l when
       segal (p1,p2) t
       || segal (p2,p3) t
@@ -213,14 +210,12 @@ let rec inCircle r c t ts = function
 	else if segal (p1,p3) t then
 	  ts := (p1,p3,lastPoint p1 p3 t)
 	else
-	  print_endline "Err:no seg"
-	    
+	  print_endline "Err:no seg"	    
   | e::l -> inCircle r c t ts l
       
 let checkTriangle tc = function
-    ([(x, y, _) as p1;p2;p3] as t) ->
-      validate := None;
-      let (cx, cy) as c = circleCenter t in
+  | ([(x, y, _) as p1;p2;p3] as t) -> validate := None;
+      let (cx, cy) as c = circleOfCenter t in
       let r = (cx -. x) *. (cx -. x) +. (cy -. y) *. (cy -. y) in
 	if int_of_float (distance (cx,cy,0.) p1) <> int_of_float
 	  (distance (cx,cy,0.) p2)
@@ -228,7 +223,7 @@ let checkTriangle tc = function
 	  (distance (cx,cy,0.) p3) then	      
 	    inCircle r c t tc !triangles;
 	!validate
-  | _ -> failwith "Ce n'est pas un triangle"
+  | _ -> failwith "Not a triangle"
       
 let addTriangle p1 p2 p3 =
   triangles := [p1;p2;p3]::!triangles
@@ -238,55 +233,41 @@ let upedSegment (x, y, _) (p1x, p1y, _) (p2x, p2y, _) =
     let coef = (p2y -. p1y) /. (p2x -. p1x) in
     let sup = p1y -. p1x *. coef in
     let y2 = coef *. x +. sup in
-      if y2 > y then
-	0
-      else
-	1
-  else
-    0
+      if y2 > y then 0
+      else 1
+  else 0
       
 let inTriangle p = function
-    [p1;p2;p3] ->
-      upedSegment p p1 p2
-      + upedSegment p p1 p3
-      + upedSegment p p2 p3
-      = 1
-  | _ -> failwith "Ce n'est pas un triangle"
+  | [p1;p2;p3] ->
+      upedSegment p p1 p2 + upedSegment p p1 p3 + upedSegment p p2 p3 = 1
+  | _ -> failwith "Not a triangle"
       
-(* findTriangleOf p reft tlist
-   find the triangle who contain p in the tlist and set the triangle in reft.
-   After, return the tlist without the triangle which contain p.*)
 let rec findTriangleOf p tr = function
   | [] -> []
-  | t::l when inTriangle p t ->
-      tr := t;
-      l
+  | t::l when inTriangle p t -> tr := t; l
   | e::l -> e::findTriangleOf p tr l
       
 let rec moveTor t1 t2 r = function
-    [] -> []
-  | e::l when tegal e t1 -> r := true;t2::l
+  | [] -> []
+  | e::l when equalTriangles e t1 -> r := true;t2::l
   | e::l -> e::moveTor t1 t2 r l
       
 let moveTo t1 t2 l =
   let r = ref false in
   let ret = moveTor t1 t2 r l in
     begin
-      if !r = false then
-	print_endline "False Search";
+      if !r = false then print_endline "False search";
       ret;
     end
       
 let rec segCheck = function
-    [p1;p2;p3] when (p1 = p2 || p1 = p3 || p2 = p3) ->
-      (*print_endline "Triangle plat"*)()
+  | [p1;p2;p3] when (p1 = p2 || p1 = p3 || p2 = p3) -> ()
   | ([p1;p2;p3] as t) ->
       let ts = ref (p1,p2,p3) in
 	begin
 	  match (checkTriangle ts t) with
 	    | None -> ()
-	    | Some (p4,_) when (p1 = p4 || p2 = p4 || p3 = p4) ->
-		(*print_endline "Triangle confondu"*)()
+	    | Some (p4,_) when (p1 = p4 || p2 = p4 || p3 = p4) -> ()
 	    | Some (p4,t2) ->
 		let (pa,pb,ps) = !ts in
 		  begin
@@ -296,7 +277,7 @@ let rec segCheck = function
 		    segCheck [pb;ps;p4];
 		  end
 	end
-  | _ -> failwith "Ce n'est pas un triangle"
+  | _ -> failwith "Not a triangle"
       
 let notEqualPoints pt =
   pt <> (!xminimal, !yminimal, !z1) &&
@@ -321,7 +302,7 @@ let insertPoint () =
 		  segCheck [p;p1;p3];
 		  vertexlist := List.tl !vertexlist;
 		end;
-	    | _ -> failwith "Ce n'est pas un triangle"
+	    | _ -> failwith "Not a triangle"
       else vertexlist := List.tl !vertexlist;
   done
     
@@ -425,13 +406,6 @@ let display3D _ =
   if(!enable_triangles) then GlDraw.begins `triangles
   else GlDraw.begins `lines;
 
-  (* GlDraw.begins `lines; *)
-  (* GlDraw.vertex3 (0., 0., 0.); *)
-  (* GlDraw.vertex3 (100., 0., 0.); *)
-  (* GlDraw.vertex3 (0., 0., 0.); *)
-  (* GlDraw.vertex3 (0., 100., 0.); *)
-  (* GlDraw.vertex3 (0., 0., 0.); *)
-  (* GlDraw.vertex3 (0., 0., 100.); *)
   map3d ();
   GlDraw.ends ();
   
