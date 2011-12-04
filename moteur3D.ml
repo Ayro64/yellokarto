@@ -37,6 +37,7 @@ let line2p line =
     done;
     x := (float_of_string !s);
     if !x = 0. then x := 1.;
+    if !x = 510. then x := 509.;
     if !x > !xmaximal then xmaximal := !x;
     if !x < !xminimal then xminimal := !x;
     s := "";
@@ -47,6 +48,7 @@ let line2p line =
     done;
     y := (float_of_string !s);
     if !y = 0. then y := 1.;
+    if !y = 510. then y := 509.;
     if !y > !ymaximal then ymaximal := !y;
     if !y < !yminimal then yminimal := !y;
     s := "";
@@ -306,7 +308,7 @@ let insertPoint () =
   while !vertexlist <> [] do
     let p = List.hd !vertexlist in
       if notEqualPoints p then
-	let t = ref [(0., 0., 0.);(0., 0., 0.);(0., 0., 0.)] in
+	let t = ref [(509., 509., 0.);(0., 509., 0.);(509., 0., 0.)] in
       	  triangles := findTriangleOf p t !triangles;
 	  match !t with
 	      [p1;p2;p3] ->
@@ -369,17 +371,18 @@ let initGL _ =
   GluMat.look_at (500., 500., 400.) (0., 0., 0.) ( 0., 0., 1.);
   GlMat.mode `modelview;
   GlMat.load_identity ();
+  
   GlClear.clear [`depth ; `color];
   Gl.enable `depth_test;
   ()
-
-let chooseColor alt =
-  if alt = 0. then GlDraw.color (0., 0., 1.);
-  if alt = 50. then GlDraw.color (0., 1., 0.);
-  if alt = 100. then GlDraw.color (0., 0.8, 0.);
-  if alt = 150. then GlDraw.color (0., 0.6, 0.);
-  if alt = 200. then GlDraw.color (0., 0.4, 0.)
     
+let chooseColor = function
+  | 0. -> GlDraw.color (0., 0., 1.)
+  | 50. -> GlDraw.color (0., 1., 0.)
+  | 100. -> GlDraw.color (0., 0.8, 0.)
+  | 150. -> GlDraw.color (0., 0.6, 0.)
+  | _ -> GlDraw.color (0., 0.4, 0.)
+     
 let rec iter xrefer yrefer = function
   | [] -> ()
   | [(x1, y1, z1);(x2, y2, z2);(x3, y3, z3)]::l ->
@@ -410,16 +413,18 @@ let rec iter xrefer yrefer = function
 let map3d _ = let xrefer = !xmaximal /. 2. and yrefer = !ymaximal /. 2. in
   iter xrefer yrefer !triangles
     
-let enable_rotate = ref false
-let set_rotate rotate = enable_rotate := rotate
+let enable_triangles = ref true
+let set_triangles triangles = enable_triangles := triangles
   
 let display3D _ =
   GlClear.clear [`depth ; `color];
   GlMat.load_identity ();
-  (* if (!enable_rotate) then *)
-  (GlMat.rotate ~angle:(50. *. time ()) ~x:0. ~y:0. ~z:1. ());
+
+  GlMat.rotate ~angle:(50. *. time ()) ~x:0. ~y:0. ~z:1. ();
   
-  GlDraw.begins `triangles;
+  if(!enable_triangles) then GlDraw.begins `triangles
+  else GlDraw.begins `lines;
+
   (* GlDraw.begins `lines; *)
   (* GlDraw.vertex3 (0., 0., 0.); *)
   (* GlDraw.vertex3 (100., 0., 0.); *)
