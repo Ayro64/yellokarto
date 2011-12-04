@@ -1,9 +1,3 @@
-(*
- * yellokarto.ml - Main file for GUI management
- * Licence: LGPLv3
- * Authors: Theo Sellem, Yello Karto
- *)
-
 (*** Init ***)
 let display_state = false
 let image_path_genuine = ref ""
@@ -309,13 +303,8 @@ let toolEntries ()=
     `I ("Démarrer/Arrêter la rotation",(fun _ -> Moteur3D.set_rotate 
     (set_rotate ())));
     `S;
-    `I ("Prendre une capture d'écran", fun _-> ());
-    `I ("Prendre une capture d'écran sous", fun _-> ());
-    `S;
-    
     `I ("Monter carte", fun _-> ());
     
-    `I ("Descendre carte", fun _-> ());
   ]
     
 let infoEntries ()=
