@@ -306,7 +306,7 @@ let editEntries ()=
     
 let toolEntries ()=
   [
-    `I ("Démarrer/Arreter la rotation",(fun _ -> Moteur3D.set_rotate 
+    `I ("Démarrer/Arrêter la rotation",(fun _ -> Moteur3D.set_rotate 
     (set_rotate ())));
     `S;
     `I ("Prendre une capture d'écran", fun _-> ());
@@ -504,5 +504,6 @@ let init_area ()=
 let _ =
   ignore(mainWindow#connect#destroy (remove_img !file_path;GMain.quit));
   init_area ();
+  Glut.init Sys.argv;
   mainWindow#show ();
   GMain.main ()
