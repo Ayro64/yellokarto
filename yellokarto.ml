@@ -276,12 +276,12 @@ Matthieu \"The Mule\" Guyot de camy\n<matthieu.guyotdecamy@epita.fr>"]
     dialog#misc#hide ()
       
       
-let enable_rotate = ref false
+let enable_triangles = ref true
 
-let set_rotate rotate = (if(!enable_rotate) 
-    then enable_rotate := false
-    else enable_rotate := true);
-    !enable_rotate
+let set_triangles triangles = (if(!enable_triangles) 
+    then enable_triangles := false
+    else enable_triangles := true);
+    !enable_triangles
 (*** configuration de menu en haut ***)
 let fileEntries ()=
   [
@@ -300,8 +300,8 @@ let editEntries ()=
     
 let toolEntries ()=
   [
-    `I ("Démarrer/Arrêter la rotation",(fun _ -> Moteur3D.set_rotate 
-    (set_rotate ())));
+    `I ("Changer de mode de vue",(fun _ -> Moteur3D.set_triangles
+    (set_triangles ())));
     `S;
     `I ("Monter carte", fun _-> ());
     
