@@ -16,6 +16,13 @@ let z1 = ref 0.
 let z2 = ref 0.
 let z3 = ref 0.
 let z4 = ref 0.
+
+let mouse_button_pressed = ref false
+let xold = ref 0
+let yold = ref 0
+let anglex = ref 0
+let angley = ref 0
+
   
 let rec ecrireTriangleTxt t () = match t with
   | [] -> close_out temp
@@ -116,9 +123,9 @@ let getpoints () =
 
       !vertexlist
 	
-let time =
-  let start = Unix.gettimeofday () in
-    fun () -> Unix.gettimeofday () -. start;;
+(* let time = *)
+(*   let start = Unix.gettimeofday () in *)
+(*     fun () -> Unix.gettimeofday () -. start;; *)
 
 
 
@@ -393,15 +400,37 @@ let rec iter xrefer yrefer = function
       
 let map3d _ = let xrefer = !xmaximal /. 2. and yrefer = !ymaximal /. 2. in
   iter xrefer yrefer !triangles
-    
+
 let enable_triangles = ref true
 let set_triangles triangles = enable_triangles := triangles
   
+
+
+let mouse_pressed button state x y =  
+  xold := x;
+  yold := y;
+  match button with
+    | 1 -> mouse_button_pressed := state
+    | _ -> ()
+    
+
+let motionMouse x y =
+  if !mouse_button_pressed then
+    begin
+      anglex := !anglex + (!xold - x);
+      angley := !angley + (!yold - y);
+    end;
+  xold := x;
+  yold := y
+    
+
+
 let display3D _ =
   GlClear.clear [`depth ; `color];
   GlMat.load_identity ();
-
-  GlMat.rotate ~angle:(50. *. time ()) ~x:0. ~y:0. ~z:1. ();
+  
+  GlMat.rotate ~angle:(float(- !angley)) ~x:0.0 ~y:1.0 ~z:0.0 ();
+  GlMat.rotate ~angle:(float(- !anglex)) ~x:0.0 ~y:0.0 ~z:1.0 ();
   
   if(!enable_triangles) then GlDraw.begins `triangles
   else GlDraw.begins `lines;
