@@ -462,7 +462,25 @@ let area = GlGtk.area
   
 let initGLenable = ref false
 let stopinitGL = ref false
-  
+
+let mouse_released t =
+  Moteur3D.mouse_pressed (GdkEvent.Button.button t) false
+    (int_of_float (GdkEvent.Button.x t))
+    (int_of_float (GdkEvent.Button.y t));
+  false
+
+let mouse_press t =
+  Moteur3D.mouse_pressed (GdkEvent.Button.button t) true
+    (int_of_float (GdkEvent.Button.x t))
+    (int_of_float (GdkEvent.Button.y t));
+  false
+    
+let mouse_motion t =
+  Moteur3D.motionMouse
+    (int_of_float (GdkEvent.Motion.x t))
+    (int_of_float (GdkEvent.Motion.y t));
+  true
+    
 let rec initthisgl () =
   if(notebook#current_page = 2) then
     (if not(!initGLenable) then
@@ -484,6 +502,10 @@ let refresh_area () =
       
       
 let init_area ()=
+  area#event#add [`ALL_EVENTS ; `BUTTON_MOTION ; `BUTTON_PRESS ; `BUTTON_RELEASE];
+  ignore(area#event#connect#motion_notify  ~callback:mouse_motion);
+  ignore(area#event#connect#button_release ~callback:mouse_released);
+  ignore(area#event#connect#button_press ~callback:mouse_press);
   ignore(GMain.Timeout.add ~ms:5 ~callback:(fun () -> 
 					      initthisgl();not(!stopinitGL)));
   ignore(GMain.Timeout.add ~ms:30 ~callback:(fun () -> refresh_area();true));
