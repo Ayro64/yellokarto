@@ -17,11 +17,13 @@ let z2 = ref 0.
 let z3 = ref 0.
 let z4 = ref 0.
 
-let mouse_button_pressed = ref false
+let left_mouse_button_pressed = ref false
+let right_mouse_button_pressed = ref false
 let xold = ref 0
 let yold = ref 0
 let anglex = ref 0
 let angley = ref 0
+let altitude = ref 500
 
   
 let rec ecrireTriangleTxt t () = match t with
@@ -356,7 +358,7 @@ let initGL _ =
   GlMat.mode `projection;
   GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 2500.);
   (* GluMat.look_at (!xcam, !xcam, !zcam) (200., 200., 200.) ( 0., 0., 1.); *)
-  GluMat.look_at (500., 500., 400.) (0., 0., 0.) ( 0., 0., 1.);
+  (* GluMat.look_at (500., 500., 500.) (0., 0., 0.) ( 0., 0., 1.); *)
   GlMat.mode `modelview;
   GlMat.load_identity ();
   
@@ -410,16 +412,19 @@ let mouse_pressed button state x y =
   xold := x;
   yold := y;
   match button with
-    | 1 -> mouse_button_pressed := state
+    | 1 -> left_mouse_button_pressed := state
+    | 3 -> right_mouse_button_pressed := state
     | _ -> ()
-    
+
 
 let motionMouse x y =
-  if !mouse_button_pressed then
+  if !left_mouse_button_pressed then
     begin
       anglex := !anglex + (!xold - x);
       angley := !angley + (!yold - y);
     end;
+  if !right_mouse_button_pressed then
+    altitude := !altitude + (!yold - y);
   xold := x;
   yold := y
     
@@ -429,13 +434,16 @@ let display3D _ =
   GlClear.clear [`depth ; `color];
   GlMat.load_identity ();
   
+  GluMat.look_at (float_of_int !altitude, float_of_int !altitude,
+  		  float_of_int !altitude) (0., 0., 0.) ( 0., 0., 1.);
+  
   GlMat.rotate ~angle:(float(- !angley)) ~x:0.0 ~y:1.0 ~z:0.0 ();
   GlMat.rotate ~angle:(float(- !anglex)) ~x:0.0 ~y:0.0 ~z:1.0 ();
   
   if(!enable_triangles) then GlDraw.begins `triangles
   else GlDraw.begins `lines;
 
-  map3d ();
+  map3d ();  
   GlDraw.ends ();
-  
+
   Gl.flush ()
