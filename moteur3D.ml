@@ -368,10 +368,14 @@ let initGL _ =
     
 let chooseColor = function
   | 0. -> GlDraw.color (0., 0., 1.)
-  | 50. -> GlDraw.color (0., 1., 0.)
-  | 100. -> GlDraw.color (0., 0.8, 0.)
-  | 150. -> GlDraw.color (0., 0.6, 0.)
-  | _ -> GlDraw.color (0., 0.4, 0.)
+  | x when x <= 50. -> GlDraw.color (0.5, 0.5, 0.)
+  | x when x > 50. && x <= 100. -> GlDraw.color (0.5, 0.5, 0.5)
+  | x when x > 100. && x <= 150.-> GlDraw.color (0.8, 0.5, 0.)
+  | x when x > 150. && x <= 200. -> GlDraw.color (0., 0.4, 0.)
+  | x when x > 200. && x <= 250. -> GlDraw.color (0., 0.6, 0.)
+  | x when x > 250. && x <= 300.-> GlDraw.color (0., 0.8, 0.)
+  | x when x > 300. && x <= 350.-> GlDraw.color (0., 1., 0.)
+  | _ -> GlDraw.color (1., 1., 0.)
      
 let rec iter xrefer yrefer = function
   | [] -> ()
