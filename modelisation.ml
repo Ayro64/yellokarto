@@ -15,6 +15,7 @@ let show img dst =
 let out_channel = open_out "map3d.obj"
 
 let list_points = ref []
+let list_triangles = ref []
 let colours_list = ref []
 
 let create_height (r,g,b,h) = colours_list := (r,g,b,h)::(!colours_list)
@@ -35,6 +36,32 @@ let string_of_char = String.make 1
 let to_pointlist () =
      list_points := !Traitement_image.points_list;
       !list_points
+
+let to_trianglelist () =
+     list_triangles := !Traitement_image.triangles_templist;
+      !list_triangles
+
+
+(* conversion d'un point2D en (coord3d, color) *)
+
+let twopto5p coord2d colorlist img =
+  let (x,y) = coord2d in
+  let (r,g,b) = (Sdlvideo.get_pixel_color img x y) in
+  let rec tptotp coord2d colorlist (r,g,b) = match (coord2d,colorlist,
+						    (r,g,b))
+  with
+    | ((x,y),((r1,g1,b1,h)::l),(r2,g2,b2)) ->
+	if (r1 = r2 && g1 = g2 && b1 = b2) then (x,y,h,r1,g1,b1)
+	else tptotp (x,y) l (r2,g2,b2);
+    | _ -> (0,0,0,0,0,0)
+  in tptotp coord2d colorlist (r,g,b)
+
+let dualtoxyzrgb img pointlist =
+    let rec d2t pl = match pl with
+    | [] -> []
+    | e::l -> (twopto5p e !colours_list img)::(d2t l)
+in d2t pointlist
+
 
 let twopto3p coord2d colorlist img =
   let (x,y) = coord2d in
@@ -60,7 +87,13 @@ let create_obj_file filepath =
   let l = to_pointlist () in
   let threepointlist = dualtotriple img l in
     makeobj threepointlist ()
-     
+
+let getfulltriangles filepath =
+  let img = loadImage filepath in
+  let l = to_trianglelist () in
+  let completepointlist = dualtoxyzrgb img l in
+	completepointlist
+
 (* Dimensions d'une image *)
 let get_dims img =
   ((Sdlvideo.surface_info img).Sdlvideo.w, 
