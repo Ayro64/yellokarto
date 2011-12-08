@@ -51,10 +51,30 @@ let blackborder filepath  =
       saveImage img (filepath^".bb.bmp");
   end
     let points_list = ref []
+    let triangles_templist = ref []
 
-let clean_point_list () = if ((List.length !points_list) > 0) then (points_list := [])
+let make_trianglelist img n =
+  let (w,h) = get_dims img in
+    for i=0 to (h-1) do
+      for j=0 to (w-1) do
+	if (j mod n = 0 && i mod n = 0) then
+	  if((i+n)<h && (j+n)<w) then 
+		triangles_templist := (j,i)::(!triangles_templist);
+		triangles_templist := (j+n,i)::(!triangles_templist);
+		triangles_templist := (j,i+n)::(!triangles_templist);
+	  if((i-n)>=0 && (i-n)>=0) then
+		triangles_templist := (j,i)::(!triangles_templist);
+		triangles_templist := (j-n,i)::(!triangles_templist);
+		triangles_templist := (j,i-n)::(!triangles_templist);
+      done
+    done
 
-let image2grill img n = clean_point_list ();
+
+
+
+let clean_point_list () = if ((List.length !points_list) > 0) then (points_list := []; triangles_templist := [])
+
+let image2grill img n = clean_point_list (); make_trianglelist img n;
   let (w,h) = get_dims img in
     let grill image j i =
       begin
