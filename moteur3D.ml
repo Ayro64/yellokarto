@@ -36,6 +36,7 @@ let rec ecrireTriangleTxt t () = match t with
 	);
       ecrireTriangleTxt l ();
     end
+  | _ -> ()
       
       
 let line2p line =
@@ -317,7 +318,7 @@ let insertPoint () =
     
     
 let initGL _ =
-  getpoints ();
+  ignore(getpoints ());
   triangles := [];
   validate := None;
   z1 := 0.;

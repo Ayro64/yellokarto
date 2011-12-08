@@ -515,6 +515,6 @@ let init_area ()=
 let _ =
   ignore(mainWindow#connect#destroy (remove_img !file_path;GMain.quit));
   init_area ();
-  Glut.init Sys.argv;
+  ignore(Glut.init Sys.argv);
   mainWindow#show ();
   GMain.main ()
