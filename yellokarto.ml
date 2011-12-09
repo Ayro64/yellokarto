@@ -285,7 +285,7 @@ Matthieu \"The Mule\" Guyot de camy\n<matthieu.guyotdecamy@epita.fr>"]
     dialog#misc#hide ()
       
       
-let enable_triangles = ref true
+let enable_triangles = ref false
 
 let set_triangles triangles = (if(!enable_triangles) 
     then enable_triangles := false
