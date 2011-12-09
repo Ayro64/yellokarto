@@ -3,6 +3,10 @@ let moteur3D = new Moteur3D.moteur3d
 let skybox = new Skybox.skybox
 let traitement = new Traitement_image.traitement
 let modelisation = new Modelisation.modelisation traitement
+  
+let initGLenable = ref false
+let stopinitGL = ref false
+
 
 let display_state = false
 let image_path_genuine = ref ""
@@ -402,15 +406,31 @@ let set_filter _ = match !filter_state with
 		(fixgrill#adjustment#value)); filter_state := true;
       image#set_file (!file_path^".grille.bmp");
       (Sys.remove (!file_path^".grille.bmp"))
-	
+
+let skyRandom = ref false
+
 let check_button_grill =
   let button = GButton.check_button
     ~label:"Affichage de la grille"
     ~active:false
     ~packing:button_grill#add () in
     button#connect#clicked set_filter
-      
-      
+ 
+let skyPath = ref ""
+let defineSkyPath _ = skyPath := "sky/sky"^(string_of_int ((Random.int 5) + 1))^".jpg"
+
+     
+let check_button_skybox =
+  let button = GButton.check_button
+    ~label:"Skybox Aleatoire"
+    ~active:false
+    ~packing:button_grill#add () in     
+    button#connect#clicked (fun () -> if(!initGLenable) then
+        begin
+            defineSkyPath ();
+            skybox#create_texture_from_image !skyPath;
+            skyRandom := true;
+        end)
       
 (*** Button Open, About & Quit, Afficher un texte à l'écran ***)
       
@@ -465,9 +485,6 @@ let area = GlGtk.area
   ~show:true
   ~packing:layout_3D#add ()
   
-let initGLenable = ref false
-let stopinitGL = ref false
-
 let mouse_released t =
 moteur3D#mouse_pressed (GdkEvent.Button.button t) false
     (int_of_float (GdkEvent.Button.x t))
@@ -485,7 +502,7 @@ let mouse_motion t =
     (int_of_float (GdkEvent.Motion.x t))
     (int_of_float (GdkEvent.Motion.y t));
   true
-    
+
 let rec initthisgl () =
   if(notebook#current_page = 2) then
     (if not(!initGLenable) then
@@ -493,9 +510,10 @@ let rec initthisgl () =
 	area#make_current ();
 	ignore(moteur3D#initGL);
     initGLenable := true;
-	skybox#create_texture_from_image "sky/sky1.jpg";
+    if(!skyRandom) then 
+        skybox#create_texture_from_image !skyPath;
 	stopinitGL := true);
-     ignore(GMain.Timeout.add ~ms:50 ~callback:(fun () -> initthisgl();false)))
+    ignore(GMain.Timeout.add ~ms:50 ~callback:(fun () -> initthisgl();false)))
       
       
 let refresh_area () = 
@@ -503,7 +521,7 @@ let refresh_area () =
     begin
       area#make_current ();
       moteur3D#display3D;
-      skybox#draw_skybox;
+      if(!skyRandom) then skybox#draw_skybox;
       area#swap_buffers ()
     end
       
