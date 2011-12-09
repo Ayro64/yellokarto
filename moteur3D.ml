@@ -340,7 +340,7 @@ method initGL  =
   
   (* maxHeight := !maxHeight +. 200.; *)
   GlMat.mode `projection;
-  GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 4500.);
+  GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 6500.);
   (* GluMat.look_at (!xcam, !xcam, !zcam) (200., 200., 200.) ( 0., 0., 1.); *)
   (* GluMat.look_at (500., 500., 500.) (0., 0., 0.) ( 0., 0., 1.); *)
   GlMat.mode `modelview;
