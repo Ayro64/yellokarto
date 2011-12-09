@@ -24,17 +24,26 @@ val mutable colours_list = []
 method create_height (r,g,b,h) = colours_list <- (r,g,b,h)::(colours_list)
 
 (*Creation du fichier .obj a partir d'une liste de triples d'entiers BON*)
-method private makeobj l =
+method private makeDelaunayFile l =
       match l with
   | [] -> close_out out_channel
   | (x,y,z)::l -> begin
       output_string out_channel 
-	("v "^ (string_of_int x)^" "^
+	((string_of_int x)^" "^
 	   (string_of_int y)^" "^
 	   (string_of_int z)^"\n");
-      this#makeobj l;
+      this#makeDelaunayFile l;
     end
-
+      
+method private makeSimpleTriangulationFile = function
+  | [] -> close_out out_channel
+  | (x,y,z,r,g,b)::t -> begin
+      output_string out_channel
+	((string_of_int x)^" "^(string_of_int y)^" "^(string_of_int z)^" "^
+	   (string_of_int r)^" "^(string_of_int g)^" "^(string_of_int b)^"\n");
+      this#makeSimpleTriangulationFile t;
+    end
+      
 method private to_pointlist =
      list_points <- traitement#get_points_list;
       list_points
@@ -84,18 +93,18 @@ method private dualtotriple img pointlist =
 in d2t pointlist
        
 
-method create_obj_file filepath =
+method create_Delaunay_file filepath =
   let img = this#loadImage filepath in
   let l = this#to_pointlist in
   let threepointlist = this#dualtotriple img l in
   print_endline (string_of_int (List.length l));
-this#makeobj threepointlist
+this#makeDelaunayFile threepointlist
 
-method private getfulltriangles filepath =
+method create_simple_triangulation_file filepath =
   let img = this#loadImage filepath in
   let l = this#to_trianglelist in
   let completepointlist = this#dualtoxyzrgb img l in
-	completepointlist
+    this#makeSimpleTriangulationFile completepointlist
 
 (* Dimensions d'une image *)
 method private get_dims img =

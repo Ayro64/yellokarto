@@ -26,7 +26,7 @@ val mutable altitude = 500
 
      
 method private line2p line =
-  let i = ref 2 and x = ref 0. and y = ref 0. and z = ref 0. and s = ref "" in
+  let i = ref 0 and x = ref 0. and y = ref 0. and z = ref 0. and s = ref "" in
     while(line.[!i] <> ' ') do
       s := !s^(string_of_char (line.[!i]));
       i := !i+1;

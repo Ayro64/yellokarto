@@ -303,8 +303,11 @@ let editEntries ()=
   [
     `I ("Valider toutes les hauteurs", fun _ -> validate_all !button_color_list);
     
-    `I ("Générer le terrain", fun _-> notebook#goto_page 2;
-	  modelisation#create_obj_file !image_path_genuine);
+    `I ("Générer le terrain", fun _ -> notebook#goto_page 2;
+	  modelisation#create_Delaunay_file !image_path_genuine);
+
+    `I ("Générer une triangulation simple", fun _ -> notebook#goto_page 2;
+	  modelisation#create_simple_triangulation_file !image_path_genuine);
   ]
     
 let toolEntries ()=
