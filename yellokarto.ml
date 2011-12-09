@@ -493,7 +493,7 @@ let rec initthisgl () =
 	area#make_current ();
 	ignore(moteur3D#initGL);
     initGLenable := true;
-	skybox#create_texture_from_image "sky/sky5.jpg";
+	skybox#create_texture_from_image "sky/sky1.jpg";
 	stopinitGL := true);
      ignore(GMain.Timeout.add ~ms:50 ~callback:(fun () -> initthisgl();false)))
       
@@ -521,7 +521,6 @@ let init_area ()=
     
 let _ =
   ignore(mainWindow#connect#destroy (remove_img !file_path;GMain.quit));  
-  ignore(Glut.init Sys.argv);
   init_area ();
   mainWindow#show ();
   GMain.main ()
