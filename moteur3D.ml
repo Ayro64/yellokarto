@@ -28,22 +28,10 @@ object (this)
   val mutable enable_triangles = true
   val mutable delaunayOrNot = false
 
-  (* val temp = open_out "triangles.txt" *)
     
   method set_triangles trianglesOrNot = enable_triangles <- trianglesOrNot
   method swapDelaunaySimple yes = delaunayOrNot <- yes
 
-  (* method ecrireTriangleTxt t () = match t with *)
-  (* | [] -> close_out temp *)
-  (* | [(x1, y1, z1, _, _, _);(x2, y2, z2, _, _, _);(x3, y3, z3, _, _, _)]::l -> begin *)
-  (*     output_string temp *)
-  (* 	("pt1 "^ (string_of_float x1)^" "^(string_of_float y1)^" "^(string_of_float z1)^"\n"^ *)
-  (* 	   "pt2 "^ (string_of_float x2)^" "^(string_of_float y2)^" "^(string_of_float z2)^"\n"^ *)
-  (* 	   "pt3 "^ (string_of_float x3)^" "^(string_of_float y3)^" "^(string_of_float z3)^"\n\n" *)
-  (* 	); *)
-  (*     this#ecrireTriangleTxt l (); *)
-  (*   end *)
-      
  
   method private line2p line =
     let i = ref 0 and x = ref 0. and y = ref 0. and z = ref 0. and
@@ -184,27 +172,37 @@ object (this)
 	
 
   method private circleOfCenter = function
-    | [(t1x, t1y, _, r1, g1, b1);(t2x, t2y, _,r2, g2, b2);(t3x, t3y, _, r3, g3, b3)] ->
-	if t1y -.t2y = 0. && t2y -.t3y = 0.then
-	  failwith "Flat triangle"
+    | [(t1x, t1y, _, r1, g1, b1);(t2x, t2y, _,r2, g2, b2);
+       (t3x, t3y, _, r3, g3, b3)] ->
+	if t1y -. t2y = 0. && t2y -. t3y = 0. then
+
+	  this#circleOfCenter [(t2x, t2y, 0., r2, g2, b2);
+			       (t3x, t3y, 0., r3, g3, b3);
+			       (t1x, t1y +. 1., 0., r1, g1, b1)]
+
+	    (* failwith "Flat triangle" *)
 	else if t2y -. t3y = 0. then
 	  this#circleOfCenter [(t2x, t2y, 0., r2, g2, b2);
 			       (t3x, t3y, 0., r3, g3, b3);
 			       (t1x, t1y, 0., r1, g1, b1)]
 	else if t1y -. t2y = 0. then
-	  let x = (t1x +. t2x) /. 2. in
-	  let (a, b) = this#median (t1x, t1y) (t3x, t3y) in
-	    (x, a *. x +. b)
+	  begin
+	    let x = (t1x +. t2x) /. 2. in
+	    let (a, b) = this#median (t1x, t1y) (t3x, t3y) in
+	      (x, a *. x +. b)
+	  end
 	else
+	  begin
 	  let (a1, b1) = this#median (t1x, t1y) (t2x, t2y)
 	  and (a2, b2) = this#median (t1x, t1y) (t3x, t3y) in
 	  let x = (b2 -. b1) /. (a1 -. a2) in
 	    (x, a1 *. x +. b1)
+	  end
     | _ -> failwith "Not a triangle"
 	
 
   method private pointInCircle r (cx,cy) t = function
-    |  [] -> None
+    | [] -> None
     | ((px, py, _, _, _, _) as p)::_ when int_of_float r > int_of_float
 	((cx -. px) *. (cx -. px) +. (cy -. py) *. (cy -. py)) ->
 	Some (p,t)
@@ -261,19 +259,23 @@ object (this)
     trianglesDelaunay <- [p1;p2;p3]::trianglesDelaunay
       
 
-  method private upedSegment (x, y, _, _, _, _) (p1x, p1y, _, _, _, _) (p2x, p2y, _, _, _, _) =
+  method private upedSegment (x, y, _, _, _, _) (p1x, p1y, _, _, _, _)
+    (p2x, p2y, _, _, _, _) =
     if x < max p1x p2x && x > min p1x p2x then
-      let coef = (p2y -. p1y) /. (p2x -. p1x) in
-      let sup = p1y -. p1x *. coef in
-      let y2 = coef *. x +. sup in
-	if y2 > y then 0
-	else 1
+      begin
+	let coef = (p2y -. p1y) /. (p2x -. p1x) in
+	let sup = p1y -. p1x *. coef in
+	let y2 = coef *. x +. sup in
+	  if y2 > y then 0
+	  else 1
+      end
     else 0
       
 
   method private inTriangle p = function
     | [p1;p2;p3] ->
-	this#upedSegment p p1 p2 + this#upedSegment p p1 p3 + this#upedSegment p p2 p3 = 1
+	this#upedSegment p p1 p2 + this#upedSegment p p1 p3 +
+	  this#upedSegment p p2 p3 = 1
     | _ -> failwith "Not a triangle"
 	
 
@@ -309,9 +311,11 @@ object (this)
 	      | Some (p4,t2) ->
 		  let (pa,pb,ps) = !ts in
 		    begin
-		      trianglesDelaunay <- this#moveTo t [pa;ps;p4] trianglesDelaunay;
+		      trianglesDelaunay <-
+			this#moveTo t [pa;ps;p4] trianglesDelaunay;
 		      this#segCheck [pa;ps;p4];
-		      trianglesDelaunay <- this#moveTo t2 [pb;ps;p4] trianglesDelaunay;
+		      trianglesDelaunay <-
+			this#moveTo t2 [pb;ps;p4] trianglesDelaunay;
 		      this#segCheck [pb;ps;p4];
 		    end
 	  end
@@ -330,84 +334,43 @@ object (this)
     while vertexlist <> [] do
       let p = List.hd vertexlist in
 	if this#notEqualPoints p then
-	  let t = ref [(0., 0., 0., 42., 42., 42.);(0., 0., 0., 42., 42., 42.);(0., 0., 0., 42., 42., 42.)] in
-      	    trianglesDelaunay <- this#findTriangleOf p t trianglesDelaunay;
-	    match !t with
-		[p1;p2;p3] ->
-		  begin
-		    this#addTriangle p p1 p2;
-		    this#segCheck [p;p1;p2];
-		    this#addTriangle p p2 p3;
-		    this#segCheck [p;p2;p3];
-		    this#addTriangle p p1 p3;
-		    this#segCheck [p;p1;p3];
-		    vertexlist <- List.tl vertexlist;
-		  end;
-	      | _ -> failwith "Not a triangle"
+	  begin
+	    let t = ref [(xminimal, yminimal, 0., 42., 42., 42.);
+			 (xmaximal, yminimal, 0., 42., 42., 42.);
+			 (xminimal, ymaximal, 0., 42., 42., 42.)] in
+      	      trianglesDelaunay <- this#findTriangleOf p t trianglesDelaunay;
+	      match !t with
+		  [p1;p2;p3] ->
+		    begin
+		      this#addTriangle p p1 p2;
+		      this#segCheck [p;p1;p2];
+		      this#addTriangle p p2 p3;
+		      this#segCheck [p;p2;p3];
+		      this#addTriangle p p1 p3;
+		      this#segCheck [p;p1;p3];
+		      vertexlist <- List.tl vertexlist;
+		    end;
+		| _ -> failwith "Not a triangle"
+	  end
 	else vertexlist <- List.tl vertexlist;
     done
-      
-      
-  (* method private correction l = match l with *)
-  (*   | [] -> [] *)
-  (*   | (x, y, z, r, g, b)::t when x = xminimal -> *)
-  (* 	(x +. 1., y, z, r, g, b)::this#correction t *)
-  (*   | (x, y, z, r, g, b)::t when x = xmaximal -> *)
-  (* 	(x -. 1., y, z, r, g, b)::this#correction t *)
-  (*   | (x, y, z, r, g, b)::t when y = yminimal -> *)
-  (* 	(x, y +. 1., z, r, g, b)::this#correction t *)
-  (*   | (x, y, z, r, g, b)::t when y = ymaximal -> *)
-  (* 	(x, y -. 1., z, r, g, b)::this#correction t *)
-  (*   | h::t -> h::this#correction t *)
 
-  (* method private correction2 = function *)
-  (*   | [] -> () *)
-  (*   | (x, y, z, r, g, b)::t when x = xminimal && y = yminimal -> *)
-  (* 	z1 <- z; this#correction2 t *)
-  (*   | (x, y, z, r, g, b)::t when x = xminimal && y = ymaximal -> *)
-  (* 	z3 <- z; this#correction2 t *)
-  (*   | (x, y, z, r, g, b)::t when x = xmaximal && y = yminimal -> *)
-  (* 	z2 <- z; this#correction2 t *)
-  (*   | (x, y, z, r, g, b)::t when x = xmaximal && y = ymaximal -> *)
-  (* 	z4 <- z; this#correction2 t *)
-  (*      | (x, y, z, r, g, b)::t -> this#correction2 t *)
-      
-      
+
   method initGL =
     ignore(this#getpoints);
     ignore(this#getTriangles);
-    (* ignore(this#correction vertexlist); *)
-    (* ignore(this#correction2 vertexlist); *)
-    
-    
-    (* print_float xminimal; *)
-    (* print_newline (); *)
-    (* print_float xmaximal; *)
-    (* print_newline (); *)
-    (* print_float yminimal; *)
-    (* print_newline (); *)
-    (* print_float ymaximal; *)
-    (* print_newline (); *)
-    (* print_float z1; *)
-    (* print_newline (); *)
-    (* print_float z2; *)
-    (* print_newline (); *)
-    (* print_float z3; *)
-    (* print_newline (); *)
-    (* print_float z4; *)
-    (* print_newline (); *)
     
     trianglesDelaunay <- [];
     validate <- None;
-
-    this#addTriangle (xminimal, yminimal, z1, 0., 0., 0.) (xmaximal, yminimal, z2, 0., 0., 0.) (xminimal, ymaximal, z3, 0., 0., 0.);
-    this#addTriangle (xmaximal, yminimal, z2, 0., 0., 0.) (xminimal, ymaximal, z3, 0., 0., 0.) (xmaximal, ymaximal, z4, 0., 0., 0.);
     
-    (* this#addTriangle (0., 0., z1, 42., 42., 42.) (510., 0., z2, 42., 42., 42.) (0., 510., z3, 42., 42., 42.); *)
-    (* this#addTriangle (510., 0., z2, 42., 42., 42.) (0., 510., z3, 42., 42., 42.) (510., 510., z4, 42., 42., 42.); *)
+    this#addTriangle (xminimal, yminimal, z1, 0., 0., 0.)
+      (xmaximal, yminimal, z2, 0., 0., 0.)
+      (xminimal, ymaximal, z3, 0., 0., 0.);
+    this#addTriangle (xmaximal, yminimal, z2, 0., 0., 0.)
+      (xminimal, ymaximal, z3, 0., 0., 0.)
+      (xmaximal, ymaximal, z4, 0., 0., 0.);
     
     this#insertPoint ();
-    (* this#ecrireTriangleTxt trianglesDelaunay (); *)
     
     GlMat.mode `projection;
     GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 6500.);
@@ -434,7 +397,7 @@ object (this)
 	    end
 	  else
 	    begin
-	      GlDraw.color (0.10, 0.9, 0.2);
+	      GlDraw.color (0.1, 0.9, 0.2);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
@@ -448,7 +411,8 @@ object (this)
 
 method private itersimple xrefer yrefer = function
     | [] -> ()
-    | (x1, y1, z1, r1, g1, b1)::(x2, y2, z2, r2, g2, b2)::(x3, y3, z3, r3, g3, b3)::l ->
+    | (x1, y1, z1, r1, g1, b1)::(x2, y2, z2, r2, g2, b2)::
+	(x3, y3, z3, r3, g3, b3)::l ->
 	begin
 	  if(enable_triangles) then
 	    begin
@@ -461,6 +425,7 @@ method private itersimple xrefer yrefer = function
 	    end
 	  else
 	    begin
+	      GlDraw.color (0.1, 0.9, 0.2);	      
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
@@ -512,9 +477,10 @@ method private itersimple xrefer yrefer = function
     
     if(enable_triangles) then GlDraw.begins `triangles
     else GlDraw.begins `lines;
-if (delaunayOrNot) then this#map3dd
-else this#map3ds;
 
+    if (delaunayOrNot) then this#map3dd
+    else this#map3ds;
+    
     GlDraw.ends ();
     (* skybox#draw_skybox; *)
     Gl.flush ()      
