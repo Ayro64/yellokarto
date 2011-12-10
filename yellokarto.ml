@@ -287,10 +287,18 @@ Matthieu \"The Mule\" Guyot de camy\n<matthieu.guyotdecamy@epita.fr>"]
       
 let enable_triangles = ref false
 
-let set_triangles triangles = (if(!enable_triangles) 
+let set_triangles yes = (if(!enable_triangles) 
     then enable_triangles := false
     else enable_triangles := true);
     !enable_triangles
+
+let delaunayOrNot = ref true
+
+let setDelaunayOrNot yes = (if(!delaunayOrNot) 
+    then delaunayOrNot := false
+    else delaunayOrNot := true);
+    !delaunayOrNot
+
 (*** configuration de menu en haut ***)
 let fileEntries ()=
   [
@@ -304,18 +312,17 @@ let editEntries ()=
     `I ("Valider toutes les hauteurs", fun _ -> validate_all !button_color_list);
     
     `I ("Générer le terrain", fun _ -> notebook#goto_page 2;
-	  modelisation#create_Delaunay_file !image_path_genuine);
-
-    `I ("Générer une triangulation simple", fun _ -> notebook#goto_page 2;
+	  modelisation#create_Delaunay_file !image_path_genuine;
 	  modelisation#create_simple_triangulation_file !image_path_genuine);
   ]
     
 let toolEntries ()=
   [
     `I ("Changer de mode de vue",(fun _ -> moteur3D#set_triangles
-    (set_triangles ())));
+				    (set_triangles ())));
     `S;
-    `I ("Monter carte", fun _-> ());
+    `I ("Changer de mode de représentation",(fun _ ->
+					       moteur3D#swapDelaunaySimple (setDelaunayOrNot ())));
     
   ]
     
@@ -529,7 +536,7 @@ let refresh_area () =
     end
       
 let init_area ()=
-  area#event#add [`ALL_EVENTS ; `BUTTON_MOTION ; `BUTTON_PRESS ; `BUTTON_RELEASE];
+  area#event#add [`BUTTON_MOTION ; `BUTTON_PRESS ; `BUTTON_RELEASE];
   ignore(area#event#connect#motion_notify  ~callback:mouse_motion);
   ignore(area#event#connect#button_release ~callback:mouse_released);
   ignore(area#event#connect#button_press ~callback:mouse_press);

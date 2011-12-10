@@ -1,8 +1,9 @@
 class moteur3d =
-object(this)
+object (this)
   
   val string_of_char = String.make 1
-  val mutable triangles = []
+  val mutable trianglesSimples = []
+  val mutable trianglesDelaunay = []
   val mutable vertexlist = []  
   val mutable validate = None
   val mutable xminimal = infinity
@@ -13,6 +14,10 @@ object(this)
   val mutable z2 =  0.
   val mutable z3 =  0.
   val mutable z4 =  0.
+  val mutable colorz1 = (0, 0, 0)
+  val mutable colorz2 = (0, 0, 0)
+  val mutable colorz3 = (0, 0, 0)
+  val mutable colorz4 = (0, 0, 0)
   val mutable left_mouse_button_pressed = false
   val mutable right_mouse_button_pressed =false
   val mutable xold = 0
@@ -21,21 +26,23 @@ object(this)
   val mutable angley = 0
   val mutable altitude = 500
   val mutable enable_triangles = false
+  val mutable delaunayOrNot = true
 
-  val temp = open_out "triangles.txt"
+  (* val temp = open_out "triangles.txt" *)
     
-  method set_triangles triangles = enable_triangles <- triangles
+  method set_triangles trianglesOrNot = enable_triangles <- trianglesOrNot
+  method swapDelaunaySimple yes = delaunayOrNot <- yes
 
-  (* method ecrireTriangleTxt t () = match t with
-  | [] -> close_out temp
-  | [(x1, y1, z1);(x2, y2, z2);(x3, y3, z3)]::l -> begin
-      output_string temp
-	("pt1 "^ (string_of_float x1)^" "^(string_of_float y1)^" "^(string_of_float z1)^"\n"^
-	   "pt2 "^ (string_of_float x2)^" "^(string_of_float y2)^" "^(string_of_float z2)^"\n"^
-	   "pt3 "^ (string_of_float x3)^" "^(string_of_float y3)^" "^(string_of_float z3)^"\n\n"
-	);
-      this#ecrireTriangleTxt l ();
-    end *)
+  (* method ecrireTriangleTxt t () = match t with *)
+  (* | [] -> close_out temp *)
+  (* | [(x1, y1, z1, _, _, _);(x2, y2, z2, _, _, _);(x3, y3, z3, _, _, _)]::l -> begin *)
+  (*     output_string temp *)
+  (* 	("pt1 "^ (string_of_float x1)^" "^(string_of_float y1)^" "^(string_of_float z1)^"\n"^ *)
+  (* 	   "pt2 "^ (string_of_float x2)^" "^(string_of_float y2)^" "^(string_of_float z2)^"\n"^ *)
+  (* 	   "pt3 "^ (string_of_float x3)^" "^(string_of_float y3)^" "^(string_of_float z3)^"\n\n" *)
+  (* 	); *)
+  (*     this#ecrireTriangleTxt l (); *)
+  (*   end *)
       
  
   method private line2p line =
@@ -47,9 +54,10 @@ object(this)
 	i := !i+1;
       done;
       x := (float_of_string !s);
-
       if !x > xmaximal then xmaximal <- !x;
       if !x < xminimal then xminimal <- !x;
+      if !x = 0. then x := 1.;
+      if !x = 510. then x := 509.;
 
       s := "";
       i := !i+1;
@@ -61,6 +69,8 @@ object(this)
 
       if !y > ymaximal then ymaximal <- !y;
       if !y < yminimal then yminimal <- !y;
+      if !y = 0. then y := 1.;
+      if !y = 510. then y := 509.;
 
       s := "";
       i := !i+1;
@@ -94,11 +104,6 @@ object(this)
       done;
       b := 0.;
 
-      (* if !x = xminimal && !y = yminimal then z1 <- !z; *)
-      (* if !x = xmaximal && !y = yminimal then z2 <- !z; *)
-      (* if !x = xminimal && !y = ymaximal then z3 <- !z; *)
-      (* if !x = xmaximal && !y = ymaximal then z4 <- !z; *)
-
       (!x, !y, !z, !r, !g, !b)
 	
 	
@@ -108,34 +113,31 @@ object(this)
 	
 	
   method getpoints =
-    let in_channel_map = open_in "map3d.obj" in
+    let in_channel_map = open_in "map3dd.yk" in
     let lines = ref [] in
       try
-	while true; do
+    	while true; do
     	  let a = input_line in_channel_map in
     	    lines := a::(!lines);
-	done; []
+    	done; []
       with End_of_file -> close_in in_channel_map;
-	vertexlist <- (this#string2plist !lines);
-
-	print_float xminimal;
-	print_newline ();
-	print_float xmaximal;
-	print_newline ();
-	print_float yminimal;
-	print_newline ();
-	print_float ymaximal;
-	print_newline ();
-	print_float z1;
-	print_newline ();
-	print_float z2;
-	print_newline ();
-	print_float z3;
-	print_newline ();
-	print_float z4;
-	print_newline ();
-
+    	vertexlist <- (this#string2plist !lines);
 	vertexlist
+
+  method getTriangles =
+    let in_channel_map = open_in "map3ds.yk" in
+    let lines = ref [] in
+      try
+    	while true; do
+    	  let a = input_line in_channel_map in
+    	    lines := a::(!lines);
+    	done; []
+      with End_of_file -> close_in in_channel_map;
+    	trianglesSimples <- (this#string2plist !lines);
+	trianglesSimples
+
+
+
 
 
   method private distance (p1x, p1y, _, _, _, _) (p2x, p2y, _, _, _, _) =
@@ -211,7 +213,7 @@ object(this)
       if List.length !l <> 1 then
 	print_endline ("Incomplete triangle");
       match !l with
-	  e::l -> e
+	| e::l -> e
 	| _ -> print_endline "Incorrect triangle";
 	    p1
 
@@ -240,17 +242,17 @@ object(this)
     | ([(x, y, _, _, _, _) as p1;p2;p3] as t) -> validate <- None;
 	let (cx, cy) as c = this#circleOfCenter t in
 	let r = (cx -. x) *. (cx -. x) +. (cy -. y) *. (cy -. y) in
-	  if int_of_float (this#distance (cx, cy, 0., 42., 42., 42.)  1) 
+	  if int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1) 
 	    <> int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p2)
 	    || int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1)
 	    <> int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p3)
-	  then this#inCircle r c t tc triangles;
+	  then this#inCircle r c t tc trianglesDelaunay;
 	  validate
     | _ -> failwith "Not a triangle"
 	
 
   method private addTriangle p1 p2 p3 =
-    triangles <- [p1;p2;p3]::triangles
+    trianglesDelaunay <- [p1;p2;p3]::trianglesDelaunay
       
 
   method private upedSegment (x, y, _, _, _, _) (p1x, p1y, _, _, _, _) (p2x, p2y, _, _, _, _) =
@@ -301,9 +303,9 @@ object(this)
 	      | Some (p4,t2) ->
 		  let (pa,pb,ps) = !ts in
 		    begin
-		      triangles <- this#moveTo t [pa;ps;p4] triangles;
+		      trianglesDelaunay <- this#moveTo t [pa;ps;p4] trianglesDelaunay;
 		      this#segCheck [pa;ps;p4];
-		      triangles <- this#moveTo t2 [pb;ps;p4] triangles;
+		      trianglesDelaunay <- this#moveTo t2 [pb;ps;p4] trianglesDelaunay;
 		      this#segCheck [pb;ps;p4];
 		    end
 	  end
@@ -323,7 +325,7 @@ object(this)
       let p = List.hd vertexlist in
 	if this#notEqualPoints p then
 	  let t = ref [(0., 0., 0., 42., 42., 42.);(0., 0., 0., 42., 42., 42.);(0., 0., 0., 42., 42., 42.)] in
-      	    triangles <- this#findTriangleOf p t triangles;
+      	    trianglesDelaunay <- this#findTriangleOf p t trianglesDelaunay;
 	    match !t with
 		[p1;p2;p3] ->
 		  begin
@@ -340,7 +342,7 @@ object(this)
     done
       
       
-  method private correction = function
+  method private correction l = match l with
     | [] -> []
     | (x, y, z, r, g, b)::t when x = xminimal ->
 	(x +. 1., y, z, r, g, b)::this#correction t
@@ -350,30 +352,46 @@ object(this)
 	(x, y +. 1., z, r, g, b)::this#correction t
     | (x, y, z, r, g, b)::t when y = ymaximal ->
 	(x, y -. 1., z, r, g, b)::this#correction t
+    | _ -> failwith "Error"
+
+  method private correction2 = function
+    | [] -> ()
+    | (x, y, z, r, g, b)::t when x = xminimal && y = yminimal ->
+	z1 <- z; this#correction2 t
+    | (x, y, z, r, g, b)::t when x = xminimal && y = ymaximal ->
+	z3 <- z; this#correction2 t
+    | (x, y, z, r, g, b)::t when x = xmaximal && y = yminimal ->
+	z2 <- z; this#correction2 t
+    | (x, y, z, r, g, b)::t when x = xmaximal && y = ymaximal ->
+	z4 <- z; this#correction2 t
+    | _ -> failwith "Error"
       
       
-  method initGL  =
+  method initGL =
     ignore(this#getpoints);
-    vertexlist <- this#correction vertexlist;
-    triangles <- [];
+    (* vertexlist <- this#correction vertexlist; *)
+    (* ignore(this#correction2 vertexlist); *)
+    
+    print_float xminimal;
+    print_newline ();
+    print_float xmaximal;
+    print_newline ();
+    print_float yminimal;
+    print_newline ();
+    print_float ymaximal;
+    print_newline ();
+    print_float z1;
+    print_newline ();
+    print_float z2;
+    print_newline ();
+    print_float z3;
+    print_newline ();
+    print_float z4;
+    print_newline ();
+    
+    trianglesDelaunay <- [];
     validate <- None;
-    z1 <- 0.;
-    z2 <- 0.;
-    z3 <- 0.;
-    z4 <- 0.;
-    (* addTriangle (0., 0., 0.) (0., 70., 0.) (70., 0., 0.); *)
-    (* addTriangle (0., 70., 0.) (70., 0., 0.) (70., 70., 0.); *)
-    
-    
-    (* addTriangle (1., 1., 0.) (510., 0., 0.) (0., 510., 0.); *)
-    (* addTriangle (510., 0., 0.) (0., 510., 0.) (510., 510., 0.); *)
-    
-    (* addTriangle (1., 1., 0.) (1., 510., 0.) (510., 1., 0.); *)
-    (* addTriangle (1., 510., 0.) (510., 1., 0.) (510., 510., 0.); *)
-    
-    (* xminimal <- 0.; *)
-    (* yminimal <- 0.; *)
-    
+
     this#addTriangle (xminimal, yminimal, z1, 0., 0., 0.) (xmaximal, yminimal, z2, 0., 0., 0.) (xminimal, ymaximal, z3, 0., 0., 0.);
     this#addTriangle (xmaximal, yminimal, z2, 0., 0., 0.) (xminimal, ymaximal, z3, 0., 0., 0.) (xmaximal, ymaximal, z4, 0., 0., 0.);
     
@@ -381,7 +399,7 @@ object(this)
     (* this#addTriangle (510., 0., z2, 42., 42., 42.) (0., 510., z3, 42., 42., 42.) (510., 510., z4, 42., 42., 42.); *)
     
     this#insertPoint ();
-    (* this#ecrireTriangleTxt triangles (); *)
+    (* this#ecrireTriangleTxt trianglesDelaunay (); *)
     
     GlMat.mode `projection;
     GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 6500.);
@@ -420,6 +438,7 @@ object(this)
 	    end
 	  else
 	    begin
+	      GlDraw.color (0.37, 0.58, 0.79);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
@@ -430,10 +449,39 @@ object(this)
 	end;
 	this#iter xrefer yrefer l
     | _ -> failwith "error"
+
+method private itersimple xrefer yrefer = function
+    | [] -> ()
+    | (x1, y1, z1, r1, g1, b1)::(x2, y2, z2, r2, g2, b2)::(x3, y3, z3, r3, g3, b3)::l ->
+	begin
+	  if(enable_triangles) then
+	    begin
+	      GlDraw.color (r1, g1, b1);
+	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
+	      GlDraw.color (r2, g2, b2);
+	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
+	      GlDraw.color (r3, g3, b3);
+	      GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3);
+	    end
+	  else
+	    begin
+	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
+	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
+	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
+	      GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3);
+	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
+	      GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3);
+	    end
+	end;
+	this#itersimple xrefer yrefer l
+    | _ -> failwith "error"
 	
 
-  method private map3d = let xrefer = xmaximal /. 2. and
-      yrefer = ymaximal /. 2. in this#iter xrefer yrefer triangles
+  method private map3dd = let xrefer = xmaximal /. 2. and
+      yrefer = ymaximal /. 2. in this#iter xrefer yrefer trianglesDelaunay
+
+  method private map3ds = let xrefer = xmaximal /. 2. and
+      yrefer = ymaximal /. 2. in this#itersimple xrefer yrefer trianglesSimples
 
     
   method mouse_pressed button state x y =  
@@ -467,8 +515,10 @@ object(this)
     GlMat.rotate ~angle:(float(- anglex)) ~x:0.0 ~y:0.0 ~z:1.0 ();
     
     if(enable_triangles) then GlDraw.begins `triangles
-    else GlDraw.begins `lines;    
-    this#map3d;  
+    else GlDraw.begins `lines;
+if (delaunayOrNot) then this#map3dd
+else this#map3ds;
+
     GlDraw.ends ();
     (* skybox#draw_skybox; *)
     Gl.flush ()      
