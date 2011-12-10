@@ -56,8 +56,8 @@ object (this)
       x := (float_of_string !s);
       if !x > xmaximal then xmaximal <- !x;
       if !x < xminimal then xminimal <- !x;
-      (* if !x = 0. then x := 1.; *)
-      (* if !x = 510. then x := 509.; *)
+      if !x = 0. then x := 1.;
+      if !x = 510. then x := 509.;
 
       s := "";
       i := !i+1;
@@ -69,8 +69,9 @@ object (this)
 
       if !y > ymaximal then ymaximal <- !y;
       if !y < yminimal then yminimal <- !y;
-      (* if !y = 0. then y := 1.; *)
-      (* if !y = 510. then y := 509.; *)
+      if !y = 0. then y := 1.;
+      if !y = 510. then y := 509.;
+
 
       s := "";
       i := !i+1;
@@ -79,6 +80,11 @@ object (this)
 	i := !i+1;
       done;
       z := (float_of_string !s);
+
+      if !x = 1. && !y = 1. then z1 <- !z;
+      if !x = 1. && !y = 509. then z3 <- !z;
+      if !x = 509. && !y = 1. then z2 <- !z;
+      if !x = 509. && !y = 509. then z4 <- !z;
 
       s := "";
       i := !i+1;
@@ -342,36 +348,37 @@ object (this)
     done
       
       
-  method private correction l = match l with
-    | [] -> []
-    | (x, y, z, r, g, b)::t when x = xminimal ->
-	(x +. 1., y, z, r, g, b)::this#correction t
-    | (x, y, z, r, g, b)::t when x = xmaximal ->
-	(x -. 1., y, z, r, g, b)::this#correction t
-    | (x, y, z, r, g, b)::t when y = yminimal ->
-	(x, y +. 1., z, r, g, b)::this#correction t
-    | (x, y, z, r, g, b)::t when y = ymaximal ->
-	(x, y -. 1., z, r, g, b)::this#correction t
-    | _ -> failwith "Error"
+  (* method private correction l = match l with *)
+  (*   | [] -> [] *)
+  (*   | (x, y, z, r, g, b)::t when x = xminimal -> *)
+  (* 	(x +. 1., y, z, r, g, b)::this#correction t *)
+  (*   | (x, y, z, r, g, b)::t when x = xmaximal -> *)
+  (* 	(x -. 1., y, z, r, g, b)::this#correction t *)
+  (*   | (x, y, z, r, g, b)::t when y = yminimal -> *)
+  (* 	(x, y +. 1., z, r, g, b)::this#correction t *)
+  (*   | (x, y, z, r, g, b)::t when y = ymaximal -> *)
+  (* 	(x, y -. 1., z, r, g, b)::this#correction t *)
+  (*   | h::t -> h::this#correction t *)
 
-  method private correction2 = function
-    | [] -> ()
-    | (x, y, z, r, g, b)::t when x = xminimal && y = yminimal ->
-	z1 <- z; this#correction2 t
-    | (x, y, z, r, g, b)::t when x = xminimal && y = ymaximal ->
-	z3 <- z; this#correction2 t
-    | (x, y, z, r, g, b)::t when x = xmaximal && y = yminimal ->
-	z2 <- z; this#correction2 t
-    | (x, y, z, r, g, b)::t when x = xmaximal && y = ymaximal ->
-	z4 <- z; this#correction2 t
-    | _ -> failwith "Error"
+  (* method private correction2 = function *)
+  (*   | [] -> () *)
+  (*   | (x, y, z, r, g, b)::t when x = xminimal && y = yminimal -> *)
+  (* 	z1 <- z; this#correction2 t *)
+  (*   | (x, y, z, r, g, b)::t when x = xminimal && y = ymaximal -> *)
+  (* 	z3 <- z; this#correction2 t *)
+  (*   | (x, y, z, r, g, b)::t when x = xmaximal && y = yminimal -> *)
+  (* 	z2 <- z; this#correction2 t *)
+  (*   | (x, y, z, r, g, b)::t when x = xmaximal && y = ymaximal -> *)
+  (* 	z4 <- z; this#correction2 t *)
+  (*      | (x, y, z, r, g, b)::t -> this#correction2 t *)
       
       
   method initGL =
     ignore(this#getpoints);
     ignore(this#getTriangles);
-    vertexlist <- this#correction vertexlist;
+    (* ignore(this#correction vertexlist); *)
     (* ignore(this#correction2 vertexlist); *)
+    
     
     print_float xminimal;
     print_newline ();
