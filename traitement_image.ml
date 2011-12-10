@@ -97,9 +97,7 @@ method private image2grill img n = this#clean_point_list; this#make_trianglelist
             if(i mod n = 0) then  grill img j i;
            if(j mod n = 0) then grill img j i;
           done;
-        done ;
-        print_endline (string_of_int (List.length
-           points_list))
+        done
   
      
 method createGrill filepath n =
