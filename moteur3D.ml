@@ -56,8 +56,8 @@ object (this)
       x := (float_of_string !s);
       if !x > xmaximal then xmaximal <- !x;
       if !x < xminimal then xminimal <- !x;
-      if !x = 0. then x := 1.;
-      if !x = 510. then x := 509.;
+      (* if !x = 0. then x := 1.; *)
+      (* if !x = 510. then x := 509.; *)
 
       s := "";
       i := !i+1;
@@ -69,8 +69,8 @@ object (this)
 
       if !y > ymaximal then ymaximal <- !y;
       if !y < yminimal then yminimal <- !y;
-      if !y = 0. then y := 1.;
-      if !y = 510. then y := 509.;
+      (* if !y = 0. then y := 1.; *)
+      (* if !y = 510. then y := 509.; *)
 
       s := "";
       i := !i+1;
@@ -369,7 +369,8 @@ object (this)
       
   method initGL =
     ignore(this#getpoints);
-    (* vertexlist <- this#correction vertexlist; *)
+    ignore(this#getTriangles);
+    vertexlist <- this#correction vertexlist;
     (* ignore(this#correction2 vertexlist); *)
     
     print_float xminimal;
