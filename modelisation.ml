@@ -28,11 +28,12 @@ object(this)
   method private makeDelaunayFile l =
     match l with
       | [] -> close_out out_channel_delaunay
-      | (x,y,z)::t -> print_string "! ";begin
+      | (x,y,z,r,g,b)::t -> print_string "! ";begin
 	  output_string out_channel_delaunay
 	    ((string_of_int x)^" "^
 	       (string_of_int y)^" "^
-	       (string_of_int z)^" 25 157 200"^"\n");
+	       (string_of_int z)^" "^
+(string_of_int r)^" "^(string_of_int g)^" "^(string_of_int b)^"\n");
 	  this#makeDelaunayFile t;
 	end
 	  
@@ -97,7 +98,7 @@ object(this)
   method create_Delaunay_file filepath =
     let img = this#loadImage filepath in
     let l = this#to_pointlist in
-    let threepointlist = this#dualtotriple img l in
+    let threepointlist = this#dualtoxyzrgb img l in
       print_endline (string_of_int (List.length l));
       this#makeDelaunayFile threepointlist
 

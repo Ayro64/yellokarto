@@ -25,8 +25,8 @@ object (this)
   val mutable anglex = 0
   val mutable angley = 0
   val mutable altitude = 500
-  val mutable enable_triangles = false
-  val mutable delaunayOrNot = true
+  val mutable enable_triangles = true
+  val mutable delaunayOrNot = false
 
   (* val temp = open_out "triangles.txt" *)
     
@@ -92,7 +92,7 @@ object (this)
 	s := !s^(string_of_char (line.[!i]));
 	i := !i+1;
       done;
-      r := (float_of_string !s);
+      r := (float_of_string !s) /. 255.;
 
       s := "";
       i := !i+1;
@@ -100,7 +100,7 @@ object (this)
 	s := !s^(string_of_char (line.[!i]));
 	i := !i+1;
       done;
-      g := (float_of_string !s);
+      g := (float_of_string !s) /. 255.;
 
       s := "";
       i := !i+1;
@@ -108,7 +108,7 @@ object (this)
 	s := !s^(string_of_char (line.[!i]));
 	i := !i+1;
       done;
-      b := 0.;
+      b := (float_of_string !s) /. 255.;
 
       (!x, !y, !z, !r, !g, !b)
 	
@@ -380,22 +380,22 @@ object (this)
     (* ignore(this#correction2 vertexlist); *)
     
     
-    print_float xminimal;
-    print_newline ();
-    print_float xmaximal;
-    print_newline ();
-    print_float yminimal;
-    print_newline ();
-    print_float ymaximal;
-    print_newline ();
-    print_float z1;
-    print_newline ();
-    print_float z2;
-    print_newline ();
-    print_float z3;
-    print_newline ();
-    print_float z4;
-    print_newline ();
+    (* print_float xminimal; *)
+    (* print_newline (); *)
+    (* print_float xmaximal; *)
+    (* print_newline (); *)
+    (* print_float yminimal; *)
+    (* print_newline (); *)
+    (* print_float ymaximal; *)
+    (* print_newline (); *)
+    (* print_float z1; *)
+    (* print_newline (); *)
+    (* print_float z2; *)
+    (* print_newline (); *)
+    (* print_float z3; *)
+    (* print_newline (); *)
+    (* print_float z4; *)
+    (* print_newline (); *)
     
     trianglesDelaunay <- [];
     validate <- None;
@@ -418,18 +418,6 @@ object (this)
     ()
       
       
-  (* method private chooseColor = function *)
-  (*   | 0. -> GlDraw.color (0., 0., 1.) *)
-  (*   | x when x <= 50. -> GlDraw.color (0.5, 0.5, 0.) *)
-  (*   | x when x > 50. && x <= 100. -> GlDraw.color (0.5, 0.5, 0.5) *)
-  (*   | x when x > 100. && x <= 150.-> GlDraw.color (0.8, 0.5, 0.) *)
-  (*   | x when x > 150. && x <= 200. -> GlDraw.color (0., 0.4, 0.) *)
-  (*   | x when x > 200. && x <= 250. -> GlDraw.color (0., 0.6, 0.) *)
-  (*   | x when x > 250. && x <= 300.-> GlDraw.color (0., 0.8, 0.) *)
-  (*   | x when x > 300. && x <= 350.-> GlDraw.color (0., 1., 0.) *)
-  (*   | _ -> GlDraw.color (1., 1., 0.) *)
-	
-
   method private iter xrefer yrefer = function
     | [] -> ()
     | [(x1, y1, z1, r1, g1, b1);(x2, y2, z2, r2, g2, b2);
@@ -446,7 +434,7 @@ object (this)
 	    end
 	  else
 	    begin
-	      GlDraw.color (0.37, 0.58, 0.79);
+	      GlDraw.color (0.10, 0.9, 0.2);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
