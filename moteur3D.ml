@@ -48,8 +48,6 @@ object(this)
       done;
       x := (float_of_string !s);
 
-      if !x = 0. then x := 1.;
-      if !x = 510. then x := 509.;
       if !x > xmaximal then xmaximal <- !x;
       if !x < xminimal then xminimal <- !x;
 
@@ -61,8 +59,6 @@ object(this)
       done;
       y := (float_of_string !s);
 
-      if !y = 0. then y := 1.;
-      if !y = 510. then y := 509.;
       if !y > ymaximal then ymaximal <- !y;
       if !y < yminimal then yminimal <- !y;
 
@@ -121,49 +117,31 @@ object(this)
 	done; []
       with End_of_file -> close_in in_channel_map;
 	vertexlist <- (this#string2plist !lines);
-	(* print_float xminimal; *)
-	(* print_newline (); *)
-	(* print_float xmaximal; *)
-	(* print_newline (); *)
-	(* print_float yminimal; *)
-	(* print_newline (); *)
-	(* print_float ymaximal; *)
-	(* print_newline (); *)
-	(* print_float z1; *)
-	(* print_newline (); *)
-	(* print_float z2; *)
-	(* print_newline (); *)
-	(* print_float z3; *)
-	(* print_newline (); *)
-	(* print_float z4; *)
-	(* print_newline (); *)
 
-	(* vertexlist <- [(10., 400., 50.)]; *)
-	
-	(* vertexlist := [(21., 100., 80.);(100., 410., 80.); *)
-	(* 		 (500., 100., 0.);(310., 310., 0.) *)
-	(* 		 (\* (321., 280., 0.);(360., 180., 50.); *\) *)
-	(* 		 (\* (200., 280., 50.);(440., 380., 50.); *\) *)
-	(* 		 (\* (489., 280., 50.);(240., 121., 50.); *\) *)
-	(* 		 (\* (321., 481., 50.);(40., 413., 0.); *\) *)
-	(* 		 (\* (10., 488., 50.);(25., 50., 0.) *\)]; *)
-	
-	(* xminimal := 1.; *)
-	(* yminimal := 1.; *)
-	(* xmaximal := 510.; *)
-	(* ymaximal := 510.; *)
-	
+	print_float xminimal;
+	print_newline ();
+	print_float xmaximal;
+	print_newline ();
+	print_float yminimal;
+	print_newline ();
+	print_float ymaximal;
+	print_newline ();
+	print_float z1;
+	print_newline ();
+	print_float z2;
+	print_newline ();
+	print_float z3;
+	print_newline ();
+	print_float z4;
+	print_newline ();
+
 	vertexlist
-	  
-  (* let time = *)
-  (*   let start = Unix.gettimeofday () in *)
-  (*     fun () -> Unix.gettimeofday () -. start;; *)
-	  
-	  
-	  
+
+
   method private distance (p1x, p1y, _, _, _, _) (p2x, p2y, _, _, _, _) =
     (p1x -. p2x) *. (p1x -. p2x) +. (p1y -. p2y) *. (p1y -. p2y)
       
+
   method private equalTriangles t1 = function
     | [p11;p12;p13] ->
 	begin
@@ -179,6 +157,7 @@ object(this)
 	end
     | _ -> failwith "Not a triangle"
 	
+
   method private segal (a, b) t =
     let l = ref t in
     let comp a b = not (a = b) in
@@ -188,18 +167,22 @@ object(this)
 	List.length !l = 1;
       end
 	
+
   method private median (x1, y1) (x2, y2) =
     let (mx, my) = ((x1 +. x2) /. 2., (y1 +. y2) /. 2.)
     and coef = -.(x2 -. x1) /. (y2 -. y1) in
     let sup = my -. mx *. coef in
       (coef, sup)
 	
+
   method private circleOfCenter = function
     | [(t1x, t1y, _, r1, g1, b1);(t2x, t2y, _,r2, g2, b2);(t3x, t3y, _, r3, g3, b3)] ->
 	if t1y -.t2y = 0. && t2y -.t3y = 0.then
 	  failwith "Flat triangle"
 	else if t2y -. t3y = 0. then
-	  this#circleOfCenter [(t2x, t2y, 0., r2, g2, b2);(t3x, t3y, 0., r3, g3, b3);(t1x, t1y, 0., r1, g1, b1)]
+	  this#circleOfCenter [(t2x, t2y, 0., r2, g2, b2);
+			       (t3x, t3y, 0., r3, g3, b3);
+			       (t1x, t1y, 0., r1, g1, b1)]
 	else if t1y -. t2y = 0. then
 	  let x = (t1x +. t2x) /. 2. in
 	  let (a, b) = this#median (t1x, t1y) (t3x, t3y) in
@@ -211,6 +194,7 @@ object(this)
 	    (x, a1 *. x +. b1)
     | _ -> failwith "Not a triangle"
 	
+
   method private pointInCircle r (cx,cy) t = function
     |  [] -> None
     | ((px, py, _, _, _, _) as p)::_ when int_of_float r > int_of_float
@@ -218,6 +202,7 @@ object(this)
 	Some (p,t)
     | _::l -> this#pointInCircle r (cx,cy) t l
 	
+
   method private lastPoint p1 p2 t =
     let l = ref t in
     let comp a b = a <> b in
@@ -229,7 +214,8 @@ object(this)
 	  e::l -> e
 	| _ -> print_endline "Incorrect triangle";
 	    p1
-	      
+
+
   method private inCircle r c t ts = function
     | [] -> ()
     | [p1;p2;p3] as e::l when
@@ -249,21 +235,24 @@ object(this)
 	    print_endline "Err:no seg"	    
     | e::l -> this#inCircle r c t ts l
 	
+
   method private checkTriangle tc = function
     | ([(x, y, _, _, _, _) as p1;p2;p3] as t) -> validate <- None;
 	let (cx, cy) as c = this#circleOfCenter t in
 	let r = (cx -. x) *. (cx -. x) +. (cy -. y) *. (cy -. y) in
-	  if int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1) <> int_of_float
-			     (this#distance (cx, cy, 0., 42., 42., 42.) p2)
-			   || int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1) <> int_of_float
-	    (this#distance (cx, cy, 0., 42., 42., 42.) p3) then	      
-	      this#inCircle r c t tc triangles;
+	  if int_of_float (this#distance (cx, cy, 0., 42., 42., 42.)  1) 
+	    <> int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p2)
+	    || int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1)
+	    <> int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p3)
+	  then this#inCircle r c t tc triangles;
 	  validate
     | _ -> failwith "Not a triangle"
 	
+
   method private addTriangle p1 p2 p3 =
     triangles <- [p1;p2;p3]::triangles
       
+
   method private upedSegment (x, y, _, _, _, _) (p1x, p1y, _, _, _, _) (p2x, p2y, _, _, _, _) =
     if x < max p1x p2x && x > min p1x p2x then
       let coef = (p2y -. p1y) /. (p2x -. p1x) in
@@ -273,21 +262,25 @@ object(this)
 	else 1
     else 0
       
+
   method private inTriangle p = function
     | [p1;p2;p3] ->
 	this#upedSegment p p1 p2 + this#upedSegment p p1 p3 + this#upedSegment p p2 p3 = 1
     | _ -> failwith "Not a triangle"
 	
+
   method private findTriangleOf p tr = function
     | [] -> []
     | t::l when this#inTriangle p t -> tr := t; l
     | e::l -> e::this#findTriangleOf p tr l
 	
+
   method private moveTor t1 t2 r = function
     | [] -> []
     | e::l when this#equalTriangles e t1 -> r := true;t2::l
     | e::l -> e::this#moveTor t1 t2 r l
 	
+
   method private moveTo t1 t2 l =
     let r = ref false in
     let ret = this#moveTor t1 t2 r l in
@@ -296,6 +289,7 @@ object(this)
 	ret;
       end
 	
+
   method private segCheck = function
     | [p1;p2;p3] when (p1 = p2 || p1 = p3 || p2 = p3) -> ()
     | ([p1;p2;p3] as t) ->
@@ -315,6 +309,7 @@ object(this)
 	  end
     | _ -> failwith "Not a triangle"
 	
+
   method private notEqualPoints (x, y, z, _, _, _) =
     let pt = (x, y, z) in
       pt <> (xminimal, yminimal, z1) &&
@@ -322,6 +317,7 @@ object(this)
 	pt <> (xmaximal, yminimal, z2) &&
 	pt <> (xmaximal, ymaximal, z4)
 	
+
   method private insertPoint () =
     while vertexlist <> [] do
       let p = List.hd vertexlist in
@@ -344,9 +340,21 @@ object(this)
     done
       
       
+  method private correction = function
+    | [] -> []
+    | (x, y, z, r, g, b)::t when x = xminimal ->
+	(x +. 1., y, z, r, g, b)::this#correction t
+    | (x, y, z, r, g, b)::t when x = xmaximal ->
+	(x -. 1., y, z, r, g, b)::this#correction t
+    | (x, y, z, r, g, b)::t when y = yminimal ->
+	(x, y +. 1., z, r, g, b)::this#correction t
+    | (x, y, z, r, g, b)::t when y = ymaximal ->
+	(x, y -. 1., z, r, g, b)::this#correction t
+      
       
   method initGL  =
     ignore(this#getpoints);
+    vertexlist <- this#correction vertexlist;
     triangles <- [];
     validate <- None;
     z1 <- 0.;
@@ -366,8 +374,8 @@ object(this)
     (* xminimal <- 0.; *)
     (* yminimal <- 0.; *)
     
-    this#addTriangle (xminimal -. 1., yminimal -. 1., z1, 0., 0., 0.) (xmaximal, yminimal -. 1., z2, 0., 0., 0.) (xminimal -. 1., ymaximal, z3, 0., 0., 0.);
-    this#addTriangle (xmaximal, yminimal -. 1., z2, 0., 0., 0.) (xminimal -. 1., ymaximal, z3, 0., 0., 0.) (xmaximal, ymaximal, z4, 0., 0., 0.);
+    this#addTriangle (xminimal, yminimal, z1, 0., 0., 0.) (xmaximal, yminimal, z2, 0., 0., 0.) (xminimal, ymaximal, z3, 0., 0., 0.);
+    this#addTriangle (xmaximal, yminimal, z2, 0., 0., 0.) (xminimal, ymaximal, z3, 0., 0., 0.) (xmaximal, ymaximal, z4, 0., 0., 0.);
     
     (* this#addTriangle (0., 0., z1, 42., 42., 42.) (510., 0., z2, 42., 42., 42.) (0., 510., z3, 42., 42., 42.); *)
     (* this#addTriangle (510., 0., z2, 42., 42., 42.) (0., 510., z3, 42., 42., 42.) (510., 510., z4, 42., 42., 42.); *)
@@ -375,45 +383,33 @@ object(this)
     this#insertPoint ();
     (* this#ecrireTriangleTxt triangles (); *)
     
-    (* maxHeight := !maxHeight +. 200.; *)
     GlMat.mode `projection;
     GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 6500.);
-    (* GluMat.look_at (!xcam, !xcam, !zcam) (200., 200., 200.) ( 0., 0., 1.); *)
-    (* GluMat.look_at (500., 500., 500.) (0., 0., 0.) ( 0., 0., 1.); *)
     GlMat.mode `modelview;
-    GlMat.load_identity ();
-    
+    GlMat.load_identity ();    
     GlClear.clear [`depth ; `color];
     Gl.enable `depth_test;
     ()
       
       
-  method private chooseColor = function
-    | 0. -> GlDraw.color (0., 0., 1.)
-    | x when x <= 50. -> GlDraw.color (0.5, 0.5, 0.)
-    | x when x > 50. && x <= 100. -> GlDraw.color (0.5, 0.5, 0.5)
-    | x when x > 100. && x <= 150.-> GlDraw.color (0.8, 0.5, 0.)
-    | x when x > 150. && x <= 200. -> GlDraw.color (0., 0.4, 0.)
-    | x when x > 200. && x <= 250. -> GlDraw.color (0., 0.6, 0.)
-    | x when x > 250. && x <= 300.-> GlDraw.color (0., 0.8, 0.)
-    | x when x > 300. && x <= 350.-> GlDraw.color (0., 1., 0.)
-    | _ -> GlDraw.color (1., 1., 0.)
+  (* method private chooseColor = function *)
+  (*   | 0. -> GlDraw.color (0., 0., 1.) *)
+  (*   | x when x <= 50. -> GlDraw.color (0.5, 0.5, 0.) *)
+  (*   | x when x > 50. && x <= 100. -> GlDraw.color (0.5, 0.5, 0.5) *)
+  (*   | x when x > 100. && x <= 150.-> GlDraw.color (0.8, 0.5, 0.) *)
+  (*   | x when x > 150. && x <= 200. -> GlDraw.color (0., 0.4, 0.) *)
+  (*   | x when x > 200. && x <= 250. -> GlDraw.color (0., 0.6, 0.) *)
+  (*   | x when x > 250. && x <= 300.-> GlDraw.color (0., 0.8, 0.) *)
+  (*   | x when x > 300. && x <= 350.-> GlDraw.color (0., 1., 0.) *)
+  (*   | _ -> GlDraw.color (1., 1., 0.) *)
 	
 
   method private iter xrefer yrefer = function
     | [] -> ()
-    | [(x1, y1, z1, r1, g1, b1);(x2, y2, z2, r2, g2, b2);(x3, y3, z3,
-							  r3, g3, b3)]::l ->
+    | [(x1, y1, z1, r1, g1, b1);(x2, y2, z2, r2, g2, b2);
+       (x3, y3, z3, r3, g3, b3)]::l ->
 	begin
 	  if(enable_triangles) then
-	    (* begin *)
-	    (*   this#chooseColor z1; *)
-	    (*   GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1); *)
-	    (*   this#chooseColor z2; *)
-	    (*   GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2); *)
-	    (*   this#chooseColor z3; *)
-	    (*   GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3); *)
-	    (* end *)
 	    begin
 	      GlDraw.color (r1, g1, b1);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
@@ -435,9 +431,10 @@ object(this)
 	this#iter xrefer yrefer l
     | _ -> failwith "error"
 	
-  method private map3d = let xrefer = xmaximal /. 2. and yrefer = ymaximal /. 2. in
-    this#iter xrefer yrefer triangles
-      
+
+  method private map3d = let xrefer = xmaximal /. 2. and
+      yrefer = ymaximal /. 2. in this#iter xrefer yrefer triangles
+
     
   method mouse_pressed button state x y =  
     xold <- x;
