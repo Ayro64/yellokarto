@@ -56,19 +56,26 @@ val mutable triangles_templist = []
 method get_points_list = points_list
 method get_triangles_templist = triangles_templist
 
+
 method private make_trianglelist img n =
   let (w,h) = this#get_dims img in
     for i=0 to (h-1) do
       for j=0 to (w-1) do
 	if (j mod n = 0 && i mod n = 0) then
+	begin
 	  if((i+n)<h && (j+n)<w) then 
+            begin
 		triangles_templist <- (j,i)::(triangles_templist);
 		triangles_templist <- (j+n,i)::(triangles_templist);
 		triangles_templist <- (j,i+n)::(triangles_templist);
-	  if((i-n)>=0 && (i-n)>=0) then
+            end;
+	  if((i-n)>=0 && (j-n)>=0) then
+            begin
 		triangles_templist <- (j,i)::(triangles_templist);
 		triangles_templist <- (j-n,i)::(triangles_templist);
 		triangles_templist <- (j,i-n)::(triangles_templist);
+            end
+	end
       done
     done
 
