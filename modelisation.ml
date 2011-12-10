@@ -2,7 +2,8 @@ class modelisation traitement =
 object(this)
   
   val traitement = traitement
-  val out_channel = open_out "map3d.obj"
+  val out_channel_delaunay = open_out "map3dd.yk"
+  val out_channel_simple = open_out "map3ds.yk"
     
   method private loadImage file =
     Sdlloader.load_image file
@@ -26,19 +27,19 @@ object(this)
   (*Creation du fichier .obj a partir d'une liste de triples d'entiers BON*)
   method private makeDelaunayFile l =
     match l with
-      | [] -> close_out out_channel
-      | (x,y,z)::l -> begin
-	  output_string out_channel 
+      | [] -> close_out out_channel_delaunay
+      | (x,y,z)::t -> print_string "! ";begin
+	  output_string out_channel_delaunay
 	    ((string_of_int x)^" "^
 	       (string_of_int y)^" "^
 	       (string_of_int z)^" 25 157 200"^"\n");
-	  this#makeDelaunayFile l;
+	  this#makeDelaunayFile t;
 	end
 	  
   method private makeSimpleTriangulationFile = function
-    | [] -> close_out out_channel
+    | [] -> close_out out_channel_simple
     | (x,y,z,r,g,b)::t -> begin
-	output_string out_channel
+	output_string out_channel_simple
 	  ((string_of_int x)^" "^(string_of_int y)^" "^(string_of_int z)^" "^
 	     (string_of_int r)^" "^(string_of_int g)^" "^(string_of_int b)^"\n");
 	this#makeSimpleTriangulationFile t;
@@ -99,6 +100,7 @@ object(this)
     let threepointlist = this#dualtotriple img l in
       print_endline (string_of_int (List.length l));
       this#makeDelaunayFile threepointlist
+
 	
   method create_simple_triangulation_file filepath =
     let img = this#loadImage filepath in
