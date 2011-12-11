@@ -33,7 +33,8 @@ object(this)
 	    ((string_of_int x)^" "^
 	       (string_of_int y)^" "^
 	       (string_of_int z)^" "^
-	       (string_of_int r)^" "^(string_of_int g)^" "^(string_of_int b)^"\n");
+	       (string_of_int r)^" "^(string_of_int g)^" "^
+	       (string_of_int b)^"\n");
 	  this#makeDelaunayFile t;
 	end
 	  
@@ -42,7 +43,8 @@ object(this)
     | (x,y,z,r,g,b)::t -> begin
 	output_string out_channel_simple
 	  ((string_of_int x)^" "^(string_of_int y)^" "^(string_of_int z)^" "^
-	     (string_of_int r)^" "^(string_of_int g)^" "^(string_of_int b)^"\n");
+	     (string_of_int r)^" "^(string_of_int g)^" "^
+	     (string_of_int b)^"\n");
 	this#makeSimpleTriangulationFile t;
       end
 	
