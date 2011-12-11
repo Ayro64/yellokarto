@@ -6,7 +6,7 @@ Une fois le logiciel lancé, cliquez sur "Ouvrir" ou faites "Fichier" puis "Ouvr
 
 Si vous le souhaitez, vous pouvez cocher la case "Skybox aléatoire" afin de rajouter un fond à l'image en trois dimensions.
 
-Vous pouvez dès à présent générer votre carte en trois dimensions, en cliquant sur "Edition" puis "Générer le terrain". Vous vous retrouvez alors dans l'onglet "Modélisation 3D" où figure la carte modélisée en trois dimensions. Vous pouvez changer le mode de vue en cliquant sur "Outils" puis "Changer de mode de vue" ou changer de mode de représentation en cliquant sur "Outils" puis "Changer de mode de représentation".
+Vous pouvez dès à présent générer votre carte en trois dimensions, en cliquant sur "Edition" puis "Générer le terrain". Vous vous retrouvez alors dans l'onglet "Modélisation 3D" où figure la carte modélisée en trois dimensions. Vous pouvez changer le mode de lissage en cliquant sur "Outils" puis "Surfaces pleines / fil de fer" ou changer de mode de représentation en cliquant sur "Outils" puis "Changer de mode de représentation".
 
 A tout moment, vous pouvez effectuer une rotation de la carte à l'aide de la souris. Maintenez le clic gauche de la souris et bougez-la. Vous pouvez également effectuer un zoom sur le centre de la carte. Pour cela, maintenez le clic droit de la souris et avancez ou reculez-la.
 
