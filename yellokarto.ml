@@ -212,19 +212,24 @@ let rec displayColors l =  ignore (modelisation#get_list_colours (!file_path));
             (if((r,g,b) <> (0,0,255)) then entry#set_text
                (string_of_int(!value_h)) else (entry#set_text "0");
                value_h :=  !value_h - 50;
-            ignore(button_color_list := ((r,g,b), entry, button)::(!button_color_list));
-             ignore(button#connect#clicked ~callback:(validateColor (r,g,b) entry button)));
+            ignore(button_color_list := ((r,g,b), entry, button)::
+		     (!button_color_list));
+             ignore(button#connect#clicked ~callback:
+		      (validateColor (r,g,b) entry button)));
             button#set_border_width 20;
           end;
           displayColors l
     | _ -> ()
 
 let rec validate_all = function
-    |((r,g,b), entry, button)::l -> validateColor (r,g,b) entry button (); validate_all l
+  | ((r,g,b), entry, button)::l -> validateColor (r,g,b)
+       entry button (); validate_all l
     | _ -> ()
 
 let rec remove_all = function
-    |((r,g,b), entry, button)::l -> button#destroy (); entry#destroy (); remove_all l
+  | ((r,g,b), entry, button)::l -> button#destroy (); entry#destroy
+      ();
+      remove_all l
     | _ -> ()
 
 let display_colors _ = if(!img_not_empty && not display_state) then
@@ -255,7 +260,7 @@ let openBox _ =
     dlg#add_select_button_stock `OPEN `OPEN;
     if dlg#run() = `OPEN then ((file_path := (str_op(dlg#filename)));
                  remove_all !button_color_list;
-			     image_path_genuine := (str_op(dlg#filename));     
+			     image_path_genuine := (str_op(dlg#filename));
 			     traitement#blackborder !file_path;
 			     file_path := (!file_path^".bb.bmp");
 			     load_img !file_path;
@@ -309,7 +314,8 @@ let fileEntries ()=
     
 let editEntries ()=
   [
-    `I ("Valider toutes les hauteurs", fun _ -> validate_all !button_color_list);
+    `I ("Valider toutes les hauteurs", fun _ -> validate_all
+	  !button_color_list);
     
     `I ("Générer le terrain", fun _ -> notebook#goto_page 2;
 	  modelisation#create_Delaunay_file !image_path_genuine;
@@ -322,7 +328,8 @@ let toolEntries ()=
 				    (set_triangles ())));
     `S;
     `I ("Changer de mode de représentation",(fun _ ->
-					       moteur3D#swapDelaunaySimple (setDelaunayOrNot ())));
+					       moteur3D#swapDelaunaySimple
+						 (setDelaunayOrNot ())));
     
   ]
     
@@ -427,7 +434,8 @@ let check_button_grill =
     button#connect#clicked set_filter
  
 let skyPath = ref ""
-let defineSkyPath _ = skyPath := "sky/sky"^(string_of_int ((Random.int 5) + 1))^".jpg"
+let defineSkyPath _ = skyPath := "sky/sky"^(string_of_int
+					      ((Random.int 5) + 1))^".jpg"
 
      
 let check_button_skybox =
@@ -560,7 +568,8 @@ let _ =
 	    print_string str
 	end
       else
-	Printf.printf ("\n\nTapez --help ou -help pour plus d'informations\n\n")
+	Printf.printf
+	  ("\n\nTapez --help ou -help pour plus d'informations\n\n")
     end
   else
     begin
