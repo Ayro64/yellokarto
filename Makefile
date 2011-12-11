@@ -16,4 +16,5 @@ libgtkgl-2.0.so:
 	-ln -s /usr/lib64/libgtkgl-2.0.so.1 libgtkgl-2.0.so
 
 clean:
-	rm -f *~ *.o *.cm? *mli 
+	rm -f *~ *.o *.cm? *mli yellokarto libgtkgl-2.0.so *.yk
+
