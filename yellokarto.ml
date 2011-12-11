@@ -318,7 +318,7 @@ let editEntries ()=
     
 let toolEntries ()=
   [
-    `I ("Changer de mode de vue",(fun _ -> moteur3D#set_triangles
+    `I ("Surfaces pleines / fil de fer",(fun _ -> moteur3D#set_triangles
 				    (set_triangles ())));
     `S;
     `I ("Changer de mode de représentation",(fun _ ->
@@ -432,7 +432,7 @@ let defineSkyPath _ = skyPath := "sky/sky"^(string_of_int ((Random.int 5) + 1))^
      
 let check_button_skybox =
   let button = GButton.check_button
-    ~label:"Skybox Aléatoire"
+    ~label:"Skybox aléatoire"
     ~active:false
     ~packing:button_grill#add () in     
     button#connect#clicked (fun () -> if(!initGLenable) then
@@ -550,10 +550,17 @@ let init_area ()=
 let _ =
   if Array.length Sys.argv > 1 then
     begin
-      if Sys.argv.(1) = "--help" ||
-	Sys.argv.(1) = "-help"  then 
-	  Printf.printf ("Manuel d'utilisation :")
-      else Printf.printf ("Erreur : tapez --help ou -help pour plus d'informations.\n")
+      if Sys.argv.(1) = "--help" || Sys.argv.(1) = "-help" then 
+	begin
+	  let text = open_in "text/README.txt" in
+	  let length = in_channel_length text in
+	  let str = String.create length in
+	    really_input text str 0 length;
+	    close_in text;
+	    print_string str
+	end
+      else
+	Printf.printf ("\n\nTapez --help ou -help pour plus d'informations\n\n")
     end
   else
     begin
