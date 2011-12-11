@@ -432,7 +432,7 @@ let defineSkyPath _ = skyPath := "sky/sky"^(string_of_int ((Random.int 5) + 1))^
      
 let check_button_skybox =
   let button = GButton.check_button
-    ~label:"Skybox Aleatoire"
+    ~label:"Skybox Aléatoire"
     ~active:false
     ~packing:button_grill#add () in     
     button#connect#clicked (fun () -> if(!initGLenable) then
@@ -548,7 +548,17 @@ let init_area ()=
     
     
 let _ =
-  ignore(mainWindow#connect#destroy (remove_img !file_path;GMain.quit));  
-  init_area ();
-  mainWindow#show ();
-  GMain.main ()
+  if Array.length Sys.argv > 1 then
+    begin
+      if Sys.argv.(1) = "--help" ||
+	Sys.argv.(1) = "-help"  then 
+	  Printf.printf ("Manuel d'utilisation :")
+      else Printf.printf ("Erreur : tapez --help ou -help pour plus d'informations.\n")
+    end
+  else
+    begin
+      ignore(mainWindow#connect#destroy (remove_img !file_path;GMain.quit));  
+      init_area ();
+      mainWindow#show ();
+      GMain.main ()
+    end
