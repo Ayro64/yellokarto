@@ -9,7 +9,7 @@ program: libgtkgl-2.0.so skybox.ml  traitement_image.ml modelisation.ml moteur3D
 	${OCAMLOPT} ${OCAMLFLAGS} ${OCAMLLD} -i traitement_image.ml > traitement_image.mli
 	${OCAMLOPT} ${OCAMLFLAGS} ${OCAMLLD} -i moteur3D.ml > moteur3D.mli
 	${OCAMLOPT} ${OCAMLFLAGS} ${OCAMLLD} -i skybox.ml > skybox.mli
-	rm -f *~ *.o *.cm? 
+	rm -f *~ *.o *.cm?
 
 
 libgtkgl-2.0.so:
