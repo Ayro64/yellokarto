@@ -397,11 +397,13 @@ object (this)
 	    end
 	  else
 	    begin
-	      GlDraw.color (0.1, 0.9, 0.2);
+	      GlDraw.color (r1, g1, b1);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
+	      GlDraw.color (r3, g3, b3);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3);
+	      GlDraw.color (r2, g2, b2);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
 	      GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3);
 	    end
@@ -425,11 +427,13 @@ method private itersimple xrefer yrefer = function
 	    end
 	  else
 	    begin
-	      GlDraw.color (0.1, 0.9, 0.2);	      
+	      GlDraw.color (r1, g1, b1);	      
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
+	      GlDraw.color (r3, g3, b3);
 	      GlDraw.vertex3 (x1 -. xrefer, y1 -. yrefer, z1);
 	      GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3);
+	      GlDraw.color (r2, g2, b2);
 	      GlDraw.vertex3 (x2 -. xrefer, y2 -. yrefer, z2);
 	      GlDraw.vertex3 (x3 -. xrefer, y3 -. yrefer, z3);
 	    end
