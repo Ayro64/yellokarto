@@ -1,25 +1,25 @@
 class moteur3d =
 object (this)
-  
+
   val string_of_char = String.make 1
   val mutable trianglesSimples = []
   val mutable trianglesDelaunay = []
-  val mutable vertexlist = []  
+  val mutable vertexlist = []
   val mutable validate = None
   val mutable xminimal = infinity
   val mutable xmaximal = neg_infinity
   val mutable yminimal = infinity
   val mutable ymaximal = neg_infinity
-  val mutable z1 =  0.
-  val mutable z2 =  0.
-  val mutable z3 =  0.
-  val mutable z4 =  0.
+  val mutable z1 = 0.
+  val mutable z2 = 0.
+  val mutable z3 = 0.
+  val mutable z4 = 0.
   val mutable colorz1 = (0, 0, 0)
   val mutable colorz2 = (0, 0, 0)
   val mutable colorz3 = (0, 0, 0)
   val mutable colorz4 = (0, 0, 0)
   val mutable left_mouse_button_pressed = false
-  val mutable right_mouse_button_pressed =false
+  val mutable right_mouse_button_pressed = false
   val mutable xold = 0
   val mutable yold = 0
   val mutable anglex = 0
@@ -60,7 +60,6 @@ object (this)
       if !y = 0. then y := 1.;
       if !y = 510. then y := 509.;
 
-
       s := "";
       i := !i+1;
       while(line.[!i] <> ' ') do
@@ -99,13 +98,13 @@ object (this)
       b := (float_of_string !s) /. 255.;
 
       (!x, !y, !z, !r, !g, !b)
-	
-	
+
+
   method string2plist = function
     | [] -> []
     | e::l -> (this#line2p e)::(this#string2plist l)
-	
-	
+
+
   method getpoints =
     let in_channel_map = open_in "map3dd.yk" in
     let lines = ref [] in
@@ -238,26 +237,26 @@ object (this)
 	  else if this#segal (p1,p3) t then
 	    ts := (p1,p3,this#lastPoint p1 p3 t)
 	  else
-	    print_endline "Err:no seg"	    
+	    print_endline "Err:no seg"
     | e::l -> this#inCircle r c t ts l
-	
+
 
   method private checkTriangle tc = function
     | ([(x, y, _, _, _, _) as p1;p2;p3] as t) -> validate <- None;
 	let (cx, cy) as c = this#circleOfCenter t in
 	let r = (cx -. x) *. (cx -. x) +. (cy -. y) *. (cy -. y) in
-	  if int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1) 
+	  if int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1)
 	    <> int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p2)
 	    || int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p1)
 	    <> int_of_float (this#distance (cx, cy, 0., 42., 42., 42.) p3)
 	  then this#inCircle r c t tc trianglesDelaunay;
 	  validate
     | _ -> failwith "Not a triangle"
-	
+
 
   method private addTriangle p1 p2 p3 =
     trianglesDelaunay <- [p1;p2;p3]::trianglesDelaunay
-      
+
 
   method private upedSegment (x, y, _, _, _, _) (p1x, p1y, _, _, _, _)
     (p2x, p2y, _, _, _, _) =
@@ -270,26 +269,25 @@ object (this)
 	  else 1
       end
     else 0
-      
 
   method private inTriangle p = function
     | [p1;p2;p3] ->
 	this#upedSegment p p1 p2 + this#upedSegment p p1 p3 +
 	  this#upedSegment p p2 p3 = 1
     | _ -> failwith "Not a triangle"
-	
+
 
   method private findTriangleOf p tr = function
     | [] -> []
     | t::l when this#inTriangle p t -> tr := t; l
     | e::l -> e::this#findTriangleOf p tr l
-	
+
 
   method private moveTor t1 t2 r = function
     | [] -> []
     | e::l when this#equalTriangles e t1 -> r := true;t2::l
     | e::l -> e::this#moveTor t1 t2 r l
-	
+
 
   method private moveTo t1 t2 l =
     let r = ref false in
@@ -320,7 +318,7 @@ object (this)
 		    end
 	  end
     | _ -> failwith "Not a triangle"
-	
+
 
   method private notEqualPoints (x, y, z, _, _, _) =
     let pt = (x, y, z) in
@@ -328,7 +326,7 @@ object (this)
 	pt <> (xminimal, ymaximal, z3) &&
 	pt <> (xmaximal, yminimal, z2) &&
 	pt <> (xmaximal, ymaximal, z4)
-	
+
 
   method private insertPoint () =
     while vertexlist <> [] do
@@ -362,25 +360,25 @@ object (this)
     
     trianglesDelaunay <- [];
     validate <- None;
-    
+
     this#addTriangle (xminimal, yminimal, z1, 0., 0., 0.)
       (xmaximal, yminimal, z2, 0., 0., 0.)
       (xminimal, ymaximal, z3, 0., 0., 0.);
     this#addTriangle (xmaximal, yminimal, z2, 0., 0., 0.)
       (xminimal, ymaximal, z3, 0., 0., 0.)
       (xmaximal, ymaximal, z4, 0., 0., 0.);
-    
+
     this#insertPoint ();
-    
+
     GlMat.mode `projection;
     GluMat.perspective ~fovy:45.0 ~aspect:(978./.470.) ~z:(0.1, 6500.);
     GlMat.mode `modelview;
-    GlMat.load_identity ();    
+    GlMat.load_identity ();
     GlClear.clear [`depth ; `color];
     Gl.enable `depth_test;
     ()
-      
-      
+
+
   method private iter xrefer yrefer = function
     | [] -> ()
     | [(x1, y1, z1, r1, g1, b1);(x2, y2, z2, r2, g2, b2);
@@ -440,7 +438,7 @@ method private itersimple xrefer yrefer = function
 	end;
 	this#itersimple xrefer yrefer l
     | _ -> failwith "error"
-	
+
 
   method private map3dd = let xrefer = xmaximal /. 2. and
       yrefer = ymaximal /. 2. in this#iter xrefer yrefer trianglesDelaunay
@@ -448,16 +446,16 @@ method private itersimple xrefer yrefer = function
   method private map3ds = let xrefer = xmaximal /. 2. and
       yrefer = ymaximal /. 2. in this#itersimple xrefer yrefer trianglesSimples
 
-    
-  method mouse_pressed button state x y =  
+
+  method mouse_pressed button state x y =
     xold <- x;
     yold <- y;
     match button with
       | 1 -> left_mouse_button_pressed <- state
       | 3 -> right_mouse_button_pressed <- state
       | _ -> ()
-	  
-	  
+
+
   method motionMouse x y =
     if left_mouse_button_pressed then
       begin
@@ -468,24 +466,23 @@ method private itersimple xrefer yrefer = function
       altitude <- altitude + (yold - y);
     xold <- x;
     yold <- y
-      
-      
+
+
   method display3D =
     GlClear.clear [`depth ; `color];
-    GlMat.load_identity ();    
+    GlMat.load_identity ();
     GluMat.look_at (float_of_int altitude, float_of_int altitude,
   		    float_of_int altitude) (0., 0., 0.) ( 0., 0., 1.);
-    
+
     GlMat.rotate ~angle:(float(- angley)) ~x:0.0 ~y:1.0 ~z:0.0 ();
     GlMat.rotate ~angle:(float(- anglex)) ~x:0.0 ~y:0.0 ~z:1.0 ();
-    
+
     if(enable_triangles) then GlDraw.begins `triangles
     else GlDraw.begins `lines;
 
     if (delaunayOrNot) then this#map3dd
     else this#map3ds;
-    
+
     GlDraw.ends ();
-    (* skybox#draw_skybox; *)
-    Gl.flush ()      
+    Gl.flush ()
 end
